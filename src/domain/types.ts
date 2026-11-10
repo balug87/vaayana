@@ -34,8 +34,24 @@ export interface MetadataCandidate extends MetadataFields {
   fetchedAt: string;
   rating?: { source: 'Open Library reader rating'; average: number; count: number; fetchedAt: string };
 }
-export interface Work extends Revision { title: string; authors: string[]; preferredEditionId?: ID; }
-export interface Edition extends Revision { workId: ID; metadata: MetadataFields; }
+export interface Work extends Revision { title: string; authors: string[]; preferredEditionId?: ID; initialStatus?: 'to-read' | 'wishlist'; catalogFamilyId?: ID; }
+export interface CatalogEntryProvenance {
+  catalogId: ID;
+  entryId: ID;
+  originalTitle: string;
+  originalAuthor: string | null;
+  sourceImages: number[];
+  notes?: string;
+  unverified: true;
+}
+export interface CatalogSource {
+  actualCount: number;
+  declaredCount?: number;
+  unknownAuthorCount: number;
+  notes?: string;
+  unverified: true;
+}
+export interface Edition extends Revision { workId: ID; metadata: MetadataFields; catalogProvenance?: CatalogEntryProvenance[]; }
 export interface Identifier extends Revision { entityId: ID; entityType: 'work' | 'edition'; scheme: 'isbn' | 'open-library-work' | 'open-library-edition'; value: string; }
 export interface Holding extends Revision { workId: ID; editionId: ID; format: BookFormat; sourceUrl?: string; }
 export interface MetadataSnapshot extends Revision { workId: ID; editionId: ID; candidate: MetadataCandidate; acceptedAt: string; }
@@ -67,9 +83,9 @@ export interface Settings {
   lastExportAt?: string;
 }
 export interface SettingsRecord extends Revision { value: Settings; }
-export interface Tombstone extends Revision { table: EntityTable; entityId: ID; deletedRevision: ID; }
+export interface Tombstone extends Revision { table: EntityTable; entityId: ID; deletedRevision: ID; catalogFamilyId?: ID; }
 export interface MergeLineage extends Revision { sourceLibraryId: ID; sourceEntityId: ID; localEntityId: ID; sourceRevision: ID; }
-export interface ImportReceipt extends Revision { exportId: ID; sourceLibraryId: ID; }
+export interface ImportReceipt extends Revision { exportId: ID; sourceLibraryId: ID; catalog?: CatalogSource; }
 export interface EntityMap {
   works: Work; editions: Edition; identifiers: Identifier; holdings: Holding;
   metadataSnapshots: MetadataSnapshot; fieldOverrides: FieldOverride;
@@ -106,6 +122,8 @@ export interface Book extends MetadataFields {
   readerRating?: RatingSnapshot;
   metadataSnapshot?: MetadataSnapshot;
   overrides: FieldOverride[];
+  catalogProvenance: CatalogEntryProvenance[];
+  catalogSources: { catalogId: ID; source: CatalogSource }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -180,8 +198,10 @@ export interface ImportConflict {
   kind: 'changed' | 'deleted' | 'archived' | 'identity';
   description: string;
   defaultDecision: 'keep-local';
+  catalogEntryIndex?: number;
 }
-export interface ImportPreview {
+export interface CatalogImportOptions { status?: 'to-read' | 'wishlist'; formats?: BookFormat[]; }
+export interface ImportPreviewBase {
   token: string;
   sourceLibraryId: ID;
   exportId: ID;
@@ -189,5 +209,13 @@ export interface ImportPreview {
   conflicts: ImportConflict[];
   alreadyImported: boolean;
   libraryRevision: number;
+  warnings: string[];
 }
+export interface BackupImportPreview extends ImportPreviewBase { format: 'vaayana-backup'; }
+export interface CatalogImportPreview extends ImportPreviewBase {
+  format: 'book-catalog';
+  source: CatalogSource;
+  defaults: { status: 'to-read' | 'wishlist'; formats: BookFormat[] };
+}
+export type ImportPreview = BackupImportPreview | CatalogImportPreview;
 export type ImportDecisions = Record<string, 'keep-local' | 'use-import'>;

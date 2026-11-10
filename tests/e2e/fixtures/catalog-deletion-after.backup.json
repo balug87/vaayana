@@ -1,0 +1,91 @@
+{
+  "format": "vaayana",
+  "formatVersion": 1,
+  "schemaVersion": 2,
+  "exportId": "1ac22e27-430c-4c09-af8e-4d927789b828",
+  "sourceLibraryId": "3f4677ff-a57b-4c84-837b-03654a495e07",
+  "exportedAt": "2026-11-10T14:36:15.301Z",
+  "entities": {
+    "works": [],
+    "editions": [],
+    "identifiers": [],
+    "holdings": [],
+    "metadataSnapshots": [],
+    "fieldOverrides": [],
+    "readingCycles": [],
+    "statusEvents": [],
+    "sessions": [],
+    "goals": [],
+    "notes": [],
+    "personalRatings": [],
+    "layerAssignments": [],
+    "tags": [],
+    "tagAssignments": [],
+    "tagRedirects": [],
+    "reviewLinks": [],
+    "ratingSnapshots": [],
+    "interests": [],
+    "recommendationFeedback": [],
+    "settings": [
+      {
+        "value": {
+          "onlineAccess": false,
+          "loadCovers": false,
+          "useLibraryInterests": false,
+          "interests": [],
+          "modelConsent": false,
+          "reducedMotion": false,
+          "view": "shelf",
+          "onboardingComplete": false,
+          "lastExportAt": "2026-11-10T14:36:15.301Z"
+        },
+        "id": "preferences",
+        "revision": "b8315ddb-cc98-465e-b0dd-71fc6cb44934",
+        "ancestors": ["dfad8e47-3fae-4cfc-94a2-0c74380de50a"],
+        "createdAt": "2026-11-10T14:36:15.294Z",
+        "updatedAt": "2026-11-10T14:36:15.301Z"
+      }
+    ],
+    "tombstones": [
+      {
+        "table": "works",
+        "entityId": "f205d6e3-60eb-8c18-9644-d0066ff3a173",
+        "deletedRevision": "ec50a22b-5f29-4d0b-a91e-4040e69bf7bb",
+        "catalogFamilyId": "9bccf136-0d7e-8c1d-a8dc-f4367e5d0623",
+        "id": "b06ff2c4-894a-4140-953a-1d080b0dc1b1",
+        "revision": "a386c9e7-8b9f-4782-a35d-d29bb4460447",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.297Z",
+        "updatedAt": "2026-11-10T14:36:15.297Z"
+      },
+      {
+        "table": "editions",
+        "entityId": "6e429d7e-e7bb-8ba7-b98a-18ec96394369",
+        "deletedRevision": "5ec5d7cf-d9c4-450c-b66e-aa9abac2be31",
+        "id": "bbca2ef0-737b-4543-9641-81a49395c822",
+        "revision": "157af670-4679-40b7-a4e0-58cbf701fc3e",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.296Z",
+        "updatedAt": "2026-11-10T14:36:15.296Z"
+      }
+    ],
+    "mergeLineage": [],
+    "importReceipts": [
+      {
+        "exportId": "024796ca-f78a-8ddc-8295-9ceb54f2685e",
+        "sourceLibraryId": "312d464e-6688-85f3-8519-0d5b5183c790",
+        "catalog": {
+          "actualCount": 1,
+          "unknownAuthorCount": 0,
+          "notes": "Fictional deletion regression.",
+          "unverified": true
+        },
+        "id": "237055c8-ba02-4fb0-8673-920f8363013c",
+        "revision": "d16dc07b-b13c-4ea6-a6bd-8d0a8e894c34",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.291Z",
+        "updatedAt": "2026-11-10T14:36:15.291Z"
+      }
+    ]
+  }
+}

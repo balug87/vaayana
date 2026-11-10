@@ -30,7 +30,7 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png'],
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}', 'import-formats/*.json'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         globIgnores: ['**/*onnx*', '**/*transformers*', '**/*semantic.worker*', '**/*.wasm', '**/*.mjs'],
       },

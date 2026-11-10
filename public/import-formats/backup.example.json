@@ -1,0 +1,273 @@
+{
+  "format": "vaayana",
+  "formatVersion": 1,
+  "schemaVersion": 2,
+  "exportId": "c0b5bf03-e79d-4172-bc98-7a24dfff8b92",
+  "sourceLibraryId": "cd2f8ea8-b40a-49e4-ac54-cf235f20ace4",
+  "exportedAt": "2026-11-10T14:33:10.554Z",
+  "entities": {
+    "works": [
+      {
+        "title": "A Practice Garden",
+        "authors": [
+          "Example Writer"
+        ],
+        "id": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "revision": "29f25dd8-b0ad-481b-a020-0b62dceed7b9",
+        "ancestors": [
+          "7222a056-b25c-4eb9-b06a-d1efccf738dc"
+        ],
+        "createdAt": "2026-11-10T14:33:10.548Z",
+        "updatedAt": "2026-11-10T14:33:10.548Z",
+        "preferredEditionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee"
+      },
+      {
+        "title": "The Example Observatory",
+        "authors": [],
+        "preferredEditionId": "852408fe-6e74-87d4-a019-c36e3ec09bb9",
+        "initialStatus": "to-read",
+        "catalogFamilyId": "221ec30a-24de-8a16-bd34-b11cf2de8217",
+        "id": "e2708bf9-5520-8911-a5df-1c868d3c3338",
+        "revision": "7e9ceed2-6185-47b3-920e-5d6a485d4bdf",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.535Z",
+        "updatedAt": "2026-11-10T14:33:10.535Z"
+      }
+    ],
+    "editions": [
+      {
+        "workId": "e2708bf9-5520-8911-a5df-1c868d3c3338",
+        "metadata": {
+          "title": "The Example Observatory",
+          "authors": []
+        },
+        "catalogProvenance": [
+          {
+            "catalogId": "6f12a06c-2c3c-8f99-921a-1adf87e5d7ff",
+            "entryId": "59ef864c-f487-863f-bbac-b623cfd5f181",
+            "originalTitle": "The Example Observatory",
+            "originalAuthor": null,
+            "sourceImages": [
+              1
+            ],
+            "notes": "Invented source note, not verified metadata.",
+            "unverified": true
+          }
+        ],
+        "id": "852408fe-6e74-87d4-a019-c36e3ec09bb9",
+        "revision": "1734c9db-0261-4942-b644-43a5c74bad5d",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.536Z",
+        "updatedAt": "2026-11-10T14:33:10.536Z"
+      },
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "metadata": {
+          "title": "A Practice Garden",
+          "authors": [
+            "Example Writer"
+          ],
+          "pageCount": 120
+        },
+        "id": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
+        "revision": "8e76453f-c52d-45b4-8855-d9920862e1a7",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.548Z",
+        "updatedAt": "2026-11-10T14:33:10.548Z"
+      }
+    ],
+    "identifiers": [],
+    "holdings": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
+        "format": "digital",
+        "id": "65fb17e9-9efc-489d-88b9-dae6f8776534",
+        "revision": "0b1e728b-715b-43ad-a181-9b46e472517f",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.549Z",
+        "updatedAt": "2026-11-10T14:33:10.549Z"
+      },
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
+        "format": "physical",
+        "id": "7187581d-6af0-4f77-9e91-b679777ced3f",
+        "revision": "95ef1866-a9e6-4b60-bdd1-b5f42651746c",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.549Z",
+        "updatedAt": "2026-11-10T14:33:10.549Z"
+      }
+    ],
+    "metadataSnapshots": [],
+    "fieldOverrides": [],
+    "readingCycles": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
+        "startedAt": "2026-11-10T14:33:10.550Z",
+        "status": "reading",
+        "id": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
+        "revision": "caf131ff-991c-45f3-80b4-70ffcd4619fe",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.550Z",
+        "updatedAt": "2026-11-10T14:33:10.550Z"
+      }
+    ],
+    "statusEvents": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "cycleId": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
+        "status": "reading",
+        "occurredAt": "2026-11-10T14:33:10.550Z",
+        "id": "00038380-e5e1-42a4-b3e2-864b862705eb",
+        "revision": "1d0ab3cd-9055-4fcb-8cac-f9625211699f",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.550Z",
+        "updatedAt": "2026-11-10T14:33:10.550Z"
+      }
+    ],
+    "sessions": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
+        "cycleId": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
+        "occurredAt": "2026-11-10T12:00:00.000Z",
+        "pages": 5,
+        "minutes": 10,
+        "page": 5,
+        "id": "1bf3a43d-fd92-4f65-911a-3a7100e34cf1",
+        "revision": "b64ea42f-1434-47ee-b662-4d0f959d27ca",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.552Z",
+        "updatedAt": "2026-11-10T14:33:10.552Z"
+      }
+    ],
+    "goals": [
+      {
+        "metric": "pages",
+        "target": 50,
+        "startDate": "2026-11-01",
+        "endDate": "2026-11-30",
+        "id": "8ad652af-80a2-4ae7-a76f-1eacbf0ed9c8",
+        "revision": "756c1b46-f419-4f67-b361-dd1f2fe35579",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.552Z",
+        "updatedAt": "2026-11-10T14:33:10.552Z"
+      }
+    ],
+    "notes": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "text": "Fictional sample reading note.",
+        "id": "0bf1e5ac-15a9-4dd7-b4c2-1db94f9cdb47",
+        "revision": "a10efac3-ca09-4a70-8b34-d0fba5ad7c89",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.551Z",
+        "updatedAt": "2026-11-10T14:33:10.551Z"
+      }
+    ],
+    "personalRatings": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "value": 4,
+        "id": "6a73e4b7-d1df-4f1f-bd07-c376d089e1de",
+        "revision": "7418ace3-c4e7-492b-8c61-5aae590c9cfd",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.551Z",
+        "updatedAt": "2026-11-10T14:33:10.551Z"
+      }
+    ],
+    "layerAssignments": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "primary": "fuel",
+        "secondary": [],
+        "purpose": "Try one practice",
+        "origin": "user",
+        "label": "user-selected",
+        "evidence": "Selected by you",
+        "pinned": true,
+        "id": "7f9a09c0-ee95-4e33-bbcc-db3374926570",
+        "revision": "589afedb-0aab-433b-8e1b-4f7fbdf84e76",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.549Z",
+        "updatedAt": "2026-11-10T14:33:10.549Z"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Example practice",
+        "normalizedName": "example practice",
+        "kind": "topic",
+        "aliases": [],
+        "archived": false,
+        "pinned": true,
+        "id": "cd559f60-57d4-4031-8e08-841f1f04182a",
+        "revision": "78930cfd-5469-45d1-98cb-e1139c556b10",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.547Z",
+        "updatedAt": "2026-11-10T14:33:10.547Z"
+      }
+    ],
+    "tagAssignments": [
+      {
+        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "tagId": "cd559f60-57d4-4031-8e08-841f1f04182a",
+        "origin": "user",
+        "state": "accepted",
+        "pinned": true,
+        "id": "4f9be563-e39a-490e-a1f9-1295baea27c0",
+        "revision": "681c9ada-f9e7-4c19-8637-2901812b4a46",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.550Z",
+        "updatedAt": "2026-11-10T14:33:10.550Z"
+      }
+    ],
+    "tagRedirects": [],
+    "reviewLinks": [],
+    "ratingSnapshots": [],
+    "interests": [],
+    "recommendationFeedback": [],
+    "settings": [
+      {
+        "value": {
+          "onlineAccess": false,
+          "loadCovers": false,
+          "useLibraryInterests": false,
+          "interests": [],
+          "modelConsent": false,
+          "reducedMotion": false,
+          "view": "shelf",
+          "onboardingComplete": false,
+          "lastExportAt": "2026-11-10T14:33:10.554Z"
+        },
+        "id": "preferences",
+        "revision": "f187fff1-3dcc-49d1-a498-c247d7bd9d1b",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.554Z",
+        "updatedAt": "2026-11-10T14:33:10.554Z"
+      }
+    ],
+    "tombstones": [],
+    "mergeLineage": [],
+    "importReceipts": [
+      {
+        "exportId": "e555f5a3-6d75-8cc8-9b5e-11450c92364e",
+        "sourceLibraryId": "6f12a06c-2c3c-8f99-921a-1adf87e5d7ff",
+        "catalog": {
+          "actualCount": 1,
+          "unknownAuthorCount": 1,
+          "declaredCount": 1,
+          "notes": "A fictional catalog used only for documentation.",
+          "unverified": true
+        },
+        "id": "b165558f-354a-4c17-912d-618184a0720a",
+        "revision": "eb5f4b53-5a4e-41de-9e29-2a1857eaa805",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:33:10.544Z",
+        "updatedAt": "2026-11-10T14:33:10.544Z"
+      }
+    ]
+  }
+}

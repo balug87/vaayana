@@ -14,7 +14,8 @@ and exports can still initialize their root identity inside a write transaction.
 
 ## Identity and metadata
 
-Local work, edition, session and other entity IDs are random UUIDs. Open Library
+Local work, edition, session and other entity IDs are UUIDs (random for manual
+entries, content-derived for repeatable external-catalog imports). Open Library
 `MetadataCandidate.workId` / `editionId` are external aliases, not local primary keys.
 Equivalent ISBN-10/13 values normalize to checksum-validated ISBN-13. Work aliases and
 ISBNs reconcile authoritative identities; similar titles never silently merge.
@@ -53,6 +54,11 @@ separate cycle. Session edits/deletions immediately recalculate goals over inclu
 calendar dates without removing unrelated events or cycles.
 
 ## Backups and imports
+
+For accepted JSON schemas, examples, defaults, errors and catalog provenance, read
+[`IMPORT_FORMAT.md`](./IMPORT_FORMAT.md). External catalogs are validated and staged
+separately from canonical backups. `previewImport(text, options?)` reports the
+detected `format`; neither format is guessed by discarding fields.
 
 Backups contain sensitive, unencrypted diary text. Save them privately. Export
 includes every owned store, provenance, settings and deletions, but no candidate

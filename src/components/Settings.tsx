@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Download, Upload, ShieldCheck, Globe, HardDrive, Sparkles, Check, Trash2, Plus, LoaderCircle } from 'lucide-react';
-import type { ImportDecisions, ImportPreview, LibrarySnapshot, Settings as Preferences, TagKind } from '../domain/types';
+import type { CatalogImportOptions, ImportDecisions, ImportPreview, LibrarySnapshot, Settings as Preferences, TagKind } from '../domain/types';
 import * as repository from '../data/repository';
 import { enableSemantic, cancelSemantic, removeSemanticModel, clearMetadataCache, SEMANTIC_MODEL } from '../services';
 import { useSemantic } from '../hooks/useSemantic';
 import { ErrorMessage } from './ui';
+import { ImportFormats } from './ImportFormats';
+import { ImportReview } from './ImportReview';
 import type { useOffline } from '../hooks/useOffline';
 
 type InstallPrompt = Event & { prompt(): Promise<void>; userChoice: Promise<{ outcome: string }> };
@@ -53,23 +55,30 @@ export default function Settings({ snapshot, offline, notify }: { snapshot: Libr
       throw error;
     }
   }
+  function clearImport() {
+    if (preview) repository.cancelImport(preview.token);
+    setPreview(undefined); setImportText(''); setDecisions({}); setReviewed(false);
+  }
+  async function stageImport(text: string, options?: CatalogImportOptions) {
+    clearImport();
+    const next = await repository.previewImport(text, options);
+    setImportText(text); setPreview(next);
+  }
   async function exportFile() {
     const text = await repository.exportBackup();
     const blob = new Blob([text], { type: 'application/json' });
     const url = URL.createObjectURL(blob); const link = document.createElement('a');
     link.href = url; link.download = `vaayana-backup-${new Date().toISOString().slice(0, 10)}.json`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    if (preview && importText) { repository.cancelImport(preview.token); setPreview(await repository.previewImport(importText)); setDecisions({}); setReviewed(false); }
+    if (preview && importText) await stageImport(importText, preview.format === 'book-catalog' ? preview.defaults : undefined);
     notify('Backup download prepared. Check that the file was saved.');
   }
   async function readImport(file?: File) {
     if (!file) return;
     await run(async () => {
+      clearImport();
       if (file.size > repository.BACKUP_LIMITS.bytes) throw new Error('This file exceeds the supported 20 MiB import limit.');
-      if (preview) repository.cancelImport(preview.token);
-      setPreview(undefined); setDecisions({}); setReviewed(false);
-      const text = await file.text(); const next = await repository.previewImport(text);
-      setImportText(text); setPreview(next);
+      await stageImport(await file.text());
     });
   }
   const activeTags = snapshot.tags.filter(t => !t.archived);
@@ -77,11 +86,21 @@ export default function Settings({ snapshot, offline, notify }: { snapshot: Libr
     <div className="page-heading"><div><div className="eyebrow"><span /> A FEW THINGS, JUST SO</div><h1>Make it yours<span className="heading-dot">.</span></h1><p>A private library. Thoughtful choices. Nothing hidden.</p></div></div>
     <ErrorMessage message={error} />
     <div className="settings-layout"><div className="settings-main">
-      <section className="settings-card" id="backup"><div className="settings-title"><Download size={22} /><div><h2>Keep a little copy</h2><p>Back up your library, or bring it to another device.</p></div></div><div className="notice subtle"><ShieldCheck size={20} /><p>Your library lives in this browser. Storage clearing, eviction, private browsing, or device loss can remove it. Installation isn't a backup. Export a copy you can keep.</p></div><p className="small-print">Last prepared export: {settings.lastExportAt ? new Date(settings.lastExportAt).toLocaleString() : 'Not yet'}. Your downloaded file includes private notes and is not encrypted. Verify that it saved successfully.</p><div className="inline-actions"><button className="primary-button" disabled={busy} onClick={() => void run(exportFile)}><Download size={17} /> Export backup</button><label className="secondary-button file-button"><Upload size={17} /> Import backup<input aria-label="Import backup" disabled={busy} type="file" accept=".json,application/json" onChange={e => { void readImport(e.target.files?.[0]); e.target.value = ''; }} /></label></div><p className="small-print">Portable JSON · format version 1 · {repository.BACKUP_LIMITS.bytes / 1024 / 1024} MiB total · {repository.BACKUP_LIMITS.records.toLocaleString()} user records plus {repository.BACKUP_LIMITS.provenanceRecords.toLocaleString()} deletion/import records maximum. Imports merge after validation; they never replace your library blindly.</p>
-        {preview && <div className="import-preview"><h3>Review import before writing</h3><p>{preview.alreadyImported ? 'This export has already been imported. Repeating it will not duplicate history.' : 'Your current library is unchanged. Review this proposed merge.'}</p><div className="import-counts">{Object.entries(preview.counts).map(([name, count]) => <div key={name}><strong>{count}</strong><span>{name}</span></div>)}</div>
-          {preview.conflicts.map(conflict => <label className="import-conflict" key={conflict.id}><strong>{conflict.kind === 'deleted' ? 'Restore or keep deleted?' : conflict.kind === 'archived' ? 'Restore or keep archived?' : 'Choose which revision to keep'}</strong><span>{conflict.description}</span><small>{conflict.table} · {conflict.entityId}</small><select aria-label={`Resolve ${conflict.id}`} value={decisions[conflict.id] ?? 'keep-local'} onChange={e => setDecisions({ ...decisions, [conflict.id]: e.target.value as 'keep-local' | 'use-import' })}><option value="keep-local">Keep local (preserve current deletion/edits)</option><option value="use-import">Use import (explicitly restore/replace this record)</option></select></label>)}
-          <p className="small-print">Deleting/archive decisions and identity mappings are preserved between snapshots. Unknown ancestry requires review. Your existing edits win by default, not the newest device clock.</p><button className="text-button" disabled={busy} onClick={() => void run(exportFile)}>Download a pre-import backup (then review again)</button><label className="inline-check"><input disabled={busy} type="checkbox" checked={reviewed} onChange={e => setReviewed(e.target.checked)} />I reviewed the merge and any restore decisions.</label><div className="inline-actions"><button className="secondary-button" disabled={busy} onClick={() => { repository.cancelImport(preview.token); setPreview(undefined); setImportText(''); }}>Cancel import</button><button className="primary-button" disabled={busy || !reviewed} onClick={() => void run(async () => { const result = await repository.commitImport(preview.token, decisions); setPreview(undefined); setImportText(''); notify(`Import complete: ${result.added} added, ${result.updated} updated, ${result.deleted} deleted.`); })}><Check size={16} /> Commit safe merge</button></div>
-        </div>}
+      <section className="settings-card" id="backup"><div className="settings-title"><Download size={22} /><div><h2>Keep a little copy</h2><p>Back up your library, or bring it to another device.</p></div></div><div className="notice subtle"><ShieldCheck size={20} /><p>Your library lives in this browser. Storage clearing, eviction, private browsing, or device loss can remove it. Installation isn't a backup. Export a copy you can keep.</p></div><p className="small-print">Last prepared export: {settings.lastExportAt ? new Date(settings.lastExportAt).toLocaleString() : 'Not yet'}. Your downloaded file includes private notes and is not encrypted. Verify that it saved successfully.</p><div className="inline-actions"><button className="primary-button" disabled={busy} onClick={() => void run(exportFile)}><Download size={17} /> Export backup</button><label className="secondary-button file-button"><Upload size={17} /> Import backup or catalog<input aria-label="Import backup or catalog" disabled={busy} type="file" accept=".json,application/json" onChange={e => { void readImport(e.target.files?.[0]); e.target.value = ''; }} /></label></div><p className="small-print">JSON imports · backups use format version 1 · {repository.BACKUP_LIMITS.bytes / 1024 / 1024} MiB total · {repository.BACKUP_LIMITS.records.toLocaleString()} user records plus {repository.BACKUP_LIMITS.provenanceRecords.toLocaleString()} deletion/import records maximum. Backups merge; catalogs add books. Both validate before writing and never replace your library blindly.</p>
+        <ImportFormats />
+        {preview && <ImportReview preview={preview} decisions={decisions} reviewed={reviewed} busy={busy}
+          onDefaultsChange={options => void run(() => stageImport(importText, options))}
+          onDecision={(id, decision) => { setDecisions({ ...decisions, [id]: decision }); setReviewed(false); }}
+          onReviewed={setReviewed}
+          onBackup={() => void run(exportFile)}
+          onCancel={clearImport}
+          onCommit={() => void run(async () => {
+            const result = await repository.commitImport(preview.token, decisions);
+            clearImport();
+            notify(`Import complete: ${result.added} added, ${result.updated} updated, ${result.deleted} deleted.`);
+          })}
+        />}
+
       </section>
       <section className="settings-card"><div className="settings-title"><Globe size={22} /><div><h2>Online, on your terms</h2><p>Your diary stays local. Some book information comes from outside.</p></div></div><Toggle label="Online lookup" description="Sends a book title, author, ISBN, or selected discovery topic and network information to Open Library. No private notes or reading history are sent." checked={settings.onlineAccess} onChange={v => void save({ onlineAccess: v })} /><Toggle label="Load book covers" description="Requests images from the Open Library cover host, which can see the requested image and your IP address. Cover rights are not guaranteed." checked={settings.loadCovers} onChange={v => void save({ loadCovers: v })} /><Toggle label="Use my accepted library topics for recommendations" description="Your chosen tags may influence broad discovery searches. Private notes are never used or sent." checked={settings.useLibraryInterests} onChange={v => void save({ useLibraryInterests: v })} /><p className="small-print">External review links open at their own sites. Model downloads contact Hugging Face and its asset hosts. No telemetry, accounts, remote diary database, or silent cloud-AI fallback.</p><button className="text-button" onClick={() => void run(clearMetadataCache, 'Replaceable metadata cache cleared. Your library is untouched.')}>Clear metadata cache only</button></section>
       <section className="settings-card" id="semantic"><div className="settings-title"><Sparkles size={22} /><div><h2>A little more meaning</h2><p>Optional semantic matching, entirely on your device after download.</p></div></div><span className="mode-badge">{semantic.mode === 'semantic-ready' ? 'Semantic ready' : semantic.mode === 'downloading' ? 'Downloading' : semantic.mode === 'basic-fallback' ? 'Basic fallback' : 'Rule-based'}</span><p className="model-description">The small MiniLM model helps match related ideas. It isn't a chatbot, review writer, or a source of new books. Basic recommendations always work without it.</p><div className="model-spec"><span><strong>~46 MB</strong> estimated initial assets</span><span><strong>23 MB</strong> weights only</span><span><strong>384</strong> dimensions</span></div><p className="small-print">{SEMANTIC_MODEL.downloadNotice} Additional worker code, caching, and browser behavior affect actual transfer. First use can take time. Mobile support and multilingual quality are not guaranteed. The model reads short book metadata, not your notes.</p><p role="status" className="semantic-message">{semantic.message}</p>{semantic.mode === 'downloading' && <><progress aria-label="Model download progress" max={1} value={semantic.progress} /><p className="small-print">{(semantic.loadedBytes / 1_000_000).toFixed(1)} MB received{semantic.totalBytes ? ` / ${(semantic.totalBytes / 1_000_000).toFixed(1)} MB reported` : ''}. Reported totals can grow as more assets are discovered.</p></>}

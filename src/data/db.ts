@@ -75,7 +75,9 @@ export async function mutate<T>(action: () => Promise<T>, database = db): Promis
 export async function removeEntity<K extends EntityTable>(table: K, id: string): Promise<void> {
   const previous = await db.entity(table).get(id);
   if (!previous) return;
-  await db.entity('tombstones').put(stamp({ table, entityId: id, deletedRevision: previous.revision }));
+  const catalogFamilyId = table === 'works' && 'catalogFamilyId' in previous ? previous.catalogFamilyId : undefined;
+  await db.entity('tombstones').put(stamp({ table, entityId: id, deletedRevision: previous.revision,
+    ...(catalogFamilyId ? { catalogFamilyId } : {}) }));
   await db.entity(table).delete(id);
 }
 export async function readEntities(database = db): Promise<{ [K in EntityTable]: EntityMap[K][] }> {

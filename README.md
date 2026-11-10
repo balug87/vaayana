@@ -42,6 +42,25 @@ For later launches, open Terminal in the existing project folder and run `npm st
 - **Discover** retrieves actual Open Library candidates for two lanes: interest-aligned and interest-expanding. Your explicit interests lead. Consented history signals are broad, visible, removable topics, not raw private purpose text or sensitive labels.
 - **Settings & backup → Export backup** downloads a portable JSON file. Keep it somewhere safe and verify it saved.
 
+## Import a book catalog or backup
+
+In **Settings & backup → Import backup or catalog**, choose one of these two JSON formats:
+
+- **Vaayana backup:** an unedited file made by **Export backup**, identified by `"format": "vaayana"` and `"formatVersion": 1`. It carries library records, notes, history, settings, and deletion information.
+- **Book catalog:** a JSON object with a `books` array. Every entry needs a non-blank `title` string and an `author` string or `null` when unknown. Optional root fields are `total_unique_titles` and `notes`; optional entry fields are `source_images` (whole-number references, not uploads) and `notes`. A bare array is not accepted.
+
+[Read the full format guide](https://balug87.github.io/vaayana/import-formats/index.html), or see the repository copy at [`public/import-formats/index.html`](public/import-formats/index.html). It includes invented downloadable examples and JSON Schemas for both formats. Exact catalog rules are also in [`src/data/IMPORT_FORMAT.md`](src/data/IMPORT_FORMAT.md).
+
+The catalog preview shows the **actual** entry count, declared total, unknown authors, warnings, and source notes. A mismatched declared total never truncates the list. Choose **To read** or **Wishlist** and unknown/physical/digital/both holdings for **new books only**. Defaults are To read and unknown holdings. No read history, finished dates, tags, Layers, or online facts are invented.
+
+Once **Offline ready** appears, the format guide, examples, and schemas are cached with the app. The inline example and local file import also work without a network connection. Optional model assets remain excluded from this app-shell download.
+
+Similar titles are skipped by default or explicitly added as separate books, never merged over your saved edits. Imported source text stays **unverified**, separate from your personal diary; entry provenance is visible in the book's **Sources** tab. Repeating the same catalog does not duplicate its books. Changing defaults or downloading a pre-import backup refreshes the preview and requires review again. Cancel saves nothing. Import does not upload the list, look up every title, or start a model download.
+
+All files are limited to **20 MiB of UTF-8 bytes**. Catalogs support up to **10,000 entries**. Unknown fields and unsupported formats are rejected, not silently discarded. The format guide explains field limits and common errors. Use the app exporter for complete backups, rather than hand-writing their internal IDs and records.
+
+**Update before transferring a new backup.** On the receiving device, open Vaayana online and reload the latest app before importing a backup made by this version. Older app copies may reject the new optional catalog-source and starting-shelf fields, even though the backup format/schema labels have not changed. The current app still reads older backups. Keep your original backup if you cannot update yet.
+
 ## Privacy and backups
 
 There is no account, telemetry, application backend, remote diary database, or automatic cross-device synchronization. Books, reading history, notes, personal ratings, tags, and Layer decisions live in IndexedDB, the browser's local database.
@@ -102,7 +121,7 @@ Source ownership/layout:
 
 ## Verification limits
 
-The build, TypeScript checks, and 129 unit tests pass. The 28-check Chromium run included live metadata and actual local-model checks. See `docs/VALIDATION.md` for coverage and limits rather than treating this README as a universal compatibility claim.
+The build, TypeScript checks, and 160 unit tests pass. The final local-root Chromium run passed 33 checks and intentionally skipped 2 opt-in live provider/model checks. All 11 scoped Pages import checks passed. Earlier baseline runs exercised live metadata and actual local-model inference. See `docs/VALIDATION.md` for coverage and limits rather than treating this README as a universal compatibility claim.
 
 The intended broader matrix is Mac Safari/Chrome, Windows Edge/Chrome/Firefox, iPhone Safari, and midrange Android Chrome. Desktop Chromium and emulated mobile checks do not establish results on actual iPhones, low-memory Android devices, Safari, or Windows hardware. GitHub Pages hosts only static files; no paid backend, app-store packaging, or automatic sync is included.
 

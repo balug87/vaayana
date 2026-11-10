@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:vaayana:import:catalog",
+  "title": "Vaayana external book catalog",
+  "description": "A local, unverified external inventory, not a Vaayana backup. The actual books array is authoritative; a declared-count mismatch is a warning. Maximum input size: 20 MiB UTF-8. The app also checks hostile keys, depth and merged-library limits.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "books"
+  ],
+  "properties": {
+    "books": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "author"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 1000,
+            "pattern": "\\S"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_images": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            "maxItems": 10000
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 20000
+          }
+        }
+      },
+      "maxItems": 10000
+    },
+    "total_unique_titles": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000000
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 20000
+    }
+  }
+}

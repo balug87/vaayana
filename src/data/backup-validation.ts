@@ -49,9 +49,16 @@ const settings: Validator = (value) => shape(value, {
   onlineAccess: bool, loadCovers: bool, useLibraryInterests: bool, interests: array(short, 100), modelConsent: bool,
   reducedMotion: bool, view: choices('shelf', 'list'), onboardingComplete: bool,
 }, { modelVersion: short, lastExportAt: date });
+const catalogSource: Validator = (value) => shape(value, {
+  actualCount: integer, unknownAuthorCount: integer, unverified: choices(true),
+}, { declaredCount: integer, notes: str });
+const catalogProvenance: Validator = (value) => shape(value, {
+  catalogId: id, entryId: id, originalTitle: str, originalAuthor: (v) => { if (v !== null) short(v); },
+  sourceImages: array(integer, BACKUP_LIMITS.arrayLength), unverified: choices(true),
+}, { notes: str });
 const definitions: Record<EntityTable, [Shape, Shape?]> = {
-  works: [{ title: str, authors: array(short) }, { preferredEditionId: id }],
-  editions: [{ workId: id, metadata }],
+  works: [{ title: str, authors: array(short) }, { preferredEditionId: id, initialStatus: choices('to-read', 'wishlist'), catalogFamilyId: id }],
+  editions: [{ workId: id, metadata }, { catalogProvenance: array(catalogProvenance, BACKUP_LIMITS.arrayLength) }],
   identifiers: [{ entityId: id, entityType: choices('work', 'edition'), scheme: choices('isbn', 'open-library-work', 'open-library-edition'), value: short }],
   holdings: [{ workId: id, editionId: id, format: choices('physical', 'digital') }, { sourceUrl: url }],
   metadataSnapshots: [{ workId: id, editionId: id, candidate, acceptedAt: date }],
@@ -73,9 +80,9 @@ const definitions: Record<EntityTable, [Shape, Shape?]> = {
   interests: [{ name: short }],
   recommendationFeedback: [{ workKey: short, action: choices('dismiss', 'less-like-this'), topics: array(short) }],
   settings: [{ value: settings }],
-  tombstones: [{ table: choices(...ENTITY_TABLES.filter((name) => !['tombstones', 'mergeLineage', 'importReceipts'].includes(name))), entityId: (v) => { if (v !== 'preferences') id(v); }, deletedRevision: id }],
+  tombstones: [{ table: choices(...ENTITY_TABLES.filter((name) => !['tombstones', 'mergeLineage', 'importReceipts'].includes(name))), entityId: (v) => { if (v !== 'preferences') id(v); }, deletedRevision: id }, { catalogFamilyId: id }],
   mergeLineage: [{ sourceLibraryId: id, sourceEntityId: (v) => { if (v !== 'preferences') id(v); }, localEntityId: (v) => { if (v !== 'preferences') id(v); }, sourceRevision: id }],
-  importReceipts: [{ exportId: id, sourceLibraryId: id }],
+  importReceipts: [{ exportId: id, sourceLibraryId: id }, { catalog: catalogSource }],
 };
 function inspectTree(value: unknown, depth = 0, entityStore = false): void {
   assert(depth <= BACKUP_LIMITS.depth, 'Backup nesting exceeds the safe limit.');
@@ -164,10 +171,15 @@ export function validateEntities(entities: BackupDocument['entities']): void {
   for (const work of entities.works) assert(worksWithEditions.has(work.id), 'A work must retain at least one edition.');
   for (const work of entities.works) if (work.preferredEditionId) assert(maps.editions.get(work.preferredEditionId)?.workId === work.id, 'Preferred edition belongs to a different work.');
 }
-export function parseBackup(text: string): BackupDocument {
-  assert(typeof text === 'string' && new TextEncoder().encode(text).byteLength <= BACKUP_LIMITS.bytes, 'Backup exceeds the 20 MiB file limit.');
-  const parsed: unknown = JSON.parse(text);
+export function parseImportJson(text: string): unknown {
+  assert(typeof text === 'string' && new TextEncoder().encode(text).byteLength <= BACKUP_LIMITS.bytes, 'Import file exceeds the 20 MiB file limit.');
+  let parsed: unknown;
+  try { parsed = JSON.parse(text); } catch { throw new Error('Invalid JSON. Choose a Vaayana backup or a book catalog JSON object containing a books array.'); }
   inspectTree(parsed);
+  return parsed;
+}
+export function parseBackup(text: string): BackupDocument {
+  const parsed = parseImportJson(text);
   shape(parsed, { format: choices('vaayana'), formatVersion: choices(1), schemaVersion: choices(1, 2), exportId: id, sourceLibraryId: id, exportedAt: date, entities: (value) => { object(value); } });
   const document = parsed as BackupDocument;
   // Version 1 predates deletion lineage. It remains importable without resetting any database.

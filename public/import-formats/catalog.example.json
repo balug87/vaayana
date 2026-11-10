@@ -1,0 +1,17 @@
+{
+  "total_unique_titles": 2,
+  "notes": "An invented two-book catalog example, not a full library backup.",
+  "books": [
+    {
+      "title": "A Field Guide to Clouds",
+      "author": "Alex Example",
+      "source_images": [1]
+    },
+    {
+      "title": "The Quiet Orchard",
+      "author": null,
+      "source_images": [2, 3],
+      "notes": "The author was not identified."
+    }
+  ]
+}

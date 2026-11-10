@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>JSON import formats · Vaayana</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#263c29;background:#faf9f0;line-height:1.7}body{max-width:900px;margin:auto;padding:32px 20px 70px}h1,h2,h3{line-height:1.25}h2{margin-top:40px}a{color:#315e34;text-underline-offset:3px}p,li,td{overflow-wrap:anywhere}code{font-size:.9em;background:#eceee0;padding:2px 4px}pre{padding:18px;overflow:auto;background:#eceee0;border-radius:5px}pre code{padding:0;background:none}table{width:100%;border-collapse:collapse;font-size:.9em}th,td{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid #c9d1bf}th{background:#eceee0}.notice{padding:18px;border-left:4px solid #526f43;background:#f0f0df}nav ul{padding-left:20px}
+  </style>
+</head>
+<body>
+  <header><a href="../">← Return to Vaayana</a><h1>JSON import formats</h1><p>Use <strong>Settings &amp; backup → Import backup or catalog</strong>. Vaayana detects one of the two formats below. It reads the file locally and shows a preview before saving anything.</p></header>
+  <nav aria-label="Downloads"><ul>
+    <li><a href="catalog.example.json" download>Download a small invented catalog example</a> · <a href="catalog.schema.json" download>Catalog JSON Schema</a></li>
+    <li><a href="backup.example.json" download>Download an app-generated, generic backup example</a> · <a href="backup.schema.json" download>Backup JSON Schema</a></li>
+  </ul></nav>
+  <p class="notice"><strong>A catalog is not a backup.</strong> A catalog supplies titles, authors, and source information. A Vaayana backup can carry your private diary, reading history, settings, and saved library records. Neither choosing a catalog nor previewing it starts an online lookup or model download.</p>
+
+  <h2 id="catalog">1. Book catalog</h2>
+  <p>The root must be an object with a <code>books</code> array, not a bare array. These example books are invented:</p>
+  <pre><code>{
+  "total_unique_titles": 2,
+  "notes": "An invented two-book catalog example, not a full library backup.",
+  "books": [
+    {
+      "title": "A Field Guide to Clouds",
+      "author": "Alex Example",
+      "source_images": [1]
+    },
+    {
+      "title": "The Quiet Orchard",
+      "author": null,
+      "source_images": [2, 3],
+      "notes": "The author was not identified."
+    }
+  ]
+}</code></pre>
+  <h3>Allowed root fields</h3>
+  <table><thead><tr><th>Field</th><th>Required?</th><th>Meaning</th></tr></thead><tbody>
+    <tr><td><code>books</code></td><td>Yes</td><td>Array of book objects, including an empty array. At most 10,000 entries.</td></tr>
+    <tr><td><code>total_unique_titles</code></td><td>No</td><td>Declared count, a whole number from 0 to 1,000,000,000. The actual array count is authoritative. A mismatch warns; it never truncates, pads, or deduplicates the list.</td></tr>
+    <tr><td><code>notes</code></td><td>No</td><td>Catalog-level source notes, at most 20,000 characters. Kept on the import receipt, not copied into personal reading notes.</td></tr>
+  </tbody></table>
+  <h3>Allowed fields in each book</h3>
+  <table><thead><tr><th>Field</th><th>Required?</th><th>Meaning</th></tr></thead><tbody>
+    <tr><td><code>title</code></td><td>Yes</td><td>Non-blank string, at most 1,000 characters. Keep the complete title, including volume, edition, or translation details and Unicode text.</td></tr>
+    <tr><td><code>author</code></td><td>Yes</td><td>String of at most 500 characters, or <code>null</code> if unknown. A blank string also means unknown. No author is guessed or split into multiple authors.</td></tr>
+    <tr><td><code>source_images</code></td><td>No</td><td>Up to 10,000 whole-number image references, each from 0 to 1,000,000,000. These are references only, not image data or URLs. No image is uploaded or downloaded.</td></tr>
+    <tr><td><code>notes</code></td><td>No</td><td>Source-entry notes, at most 20,000 characters, including any uncertainty. Kept with unverified source provenance, separate from your diary.</td></tr>
+  </tbody></table>
+  <p>Only these fields are accepted. Use valid JSON: double quotes, no comments, no trailing commas. Unknown fields are rejected rather than silently discarded. Every file is limited to <strong>20 MiB of UTF-8 bytes</strong>; the resulting library must also fit the backup record limits below.</p>
+
+  <h3>Preview, defaults, and duplicate safety</h3>
+  <ol>
+    <li>Choose the file. Check the detected format, actual entries, declared total, unknown authors, source notes, and warnings. Previewing has not saved books.</li>
+    <li>Choose a starting shelf: <strong>To read</strong> (default) or <strong>Wishlist</strong>. Choose owned formats: <strong>Unknown / no copy specified</strong> (default), physical, digital, or both. Choices apply only to new books.</li>
+    <li>If an entry resembles a saved title/author, <strong>Skip entry</strong> is the default. You may explicitly <strong>Add as a separate book</strong>, never replace the existing book. A previously deleted entry needs an explicit restore choice when offered.</li>
+    <li>Optionally download a pre-import backup. This refreshes the preview and resets your review while keeping the catalog choices.</li>
+    <li>Review again, check the confirmation box, then select <strong>Import reviewed catalog</strong>. Or select <strong>Cancel import</strong> to discard the preview.</li>
+  </ol>
+  <p>All imported source text remains <strong>unverified</strong>. Original title, original author (including <code>null</code>), image references, and entry notes are preserved and visible under the book journal's <strong>Sources</strong> tab. Catalog-level source notes remain in the import receipt. A full backup preserves both.</p>
+  <p>A catalog creates no reading cycles, finished dates, reading-status events, or sessions. It infers no ISBN, page count, language, rating, tag, Layer, or provider fact. Existing corrections, notes, holdings, and reading history remain unchanged. Edition-, translation-, revision-, and volume-specific entries remain distinct. Repeated identical rows are kept separately with a warning.</p>
+  <p>Repeating the same imported file does not duplicate its books or resurrect deleted entries. Formatting or key-order changes do not create a new source identity. Overlapping catalogs may add source provenance without replacing your edits. Changing source-row content can represent a new entry, so review any possible-duplicate choices rather than relying on title-based merging.</p>
+
+  <h2 id="backup">2. Vaayana backup</h2>
+  <p>Make this file with <strong>Export backup</strong>. Import it unedited. Do not rename catalog fields or invent internal IDs to imitate a backup.</p>
+  <p>A backup contains <code>"format": "vaayana"</code>, <code>"formatVersion": 1</code>, <code>"schemaVersion": 1</code> or <code>2</code> (current exports use <code>2</code>), <code>exportId</code>, <code>sourceLibraryId</code>, <code>exportedAt</code>, and an <code>entities</code> object containing the supported record stores. The downloadable backup example was produced by the app exporter, using only generic invented data.</p>
+  <p>Backups validate structure, versions, IDs, relationships, supported URLs, and limits before a merge. They retain revision and deletion information. Local edits and deletions win by default; changing or restoring conflicting records requires an explicit decision. A malformed backup is not reinterpreted as a catalog.</p>
+  <p class="notice"><strong>Update the receiving app first.</strong> Before importing a newly exported backup on another device, open Vaayana online and reload the latest version. Older app copies can reject the new optional catalog-source and starting-shelf fields, even though the backup format/schema labels are unchanged. The current app reads older backups. Keep your original file if you cannot update yet.</p>
+  <p>Limits: <strong>20 MiB</strong> total, <strong>50,000</strong> user records plus <strong>100,000</strong> deletion/import-provenance records, with field, array, and nesting caps. The schemas describe JSON structure. The importer additionally checks relationships, valid identifiers, aggregate limits, and other semantic rules that JSON Schema alone cannot establish.</p>
+  <p class="notice"><strong>Backups are not encrypted.</strong> They can contain private notes, history, settings, and source material. Save them somewhere safe. Do not publish your real backup or catalog as an example.</p>
+
+  <h2 id="errors">If an import is rejected</h2>
+  <ul>
+    <li><strong>Invalid JSON:</strong> check double quotes, commas, and closing brackets. The importer does not quote private book text in parsing errors.</li>
+    <li><strong>Unsupported format:</strong> use an app-exported backup or an object containing a <code>books</code> array. CSV, a bare array, and arbitrary third-party backups are not guessed.</li>
+    <li><strong>Unsupported fields:</strong> compare the field names with the tables above. For an unknown author, include <code>"author": null</code> rather than omitting the field.</li>
+    <li><strong>Declared count differs:</strong> this is a warning, not a reason to trim the list. The preview uses every actual entry.</li>
+    <li><strong>Library changed after preview:</strong> choose the file again and review the new preview, including any new conflicts.</li>
+  </ul>
+  <p>Malformed files, cancelled previews, stale previews, and failed writes leave the saved library unchanged. Accepted records and their source information are saved together, not as a partially imported list.</p>
+  <footer><p><a href="../">Return to Vaayana</a></p></footer>
+</body>
+</html>

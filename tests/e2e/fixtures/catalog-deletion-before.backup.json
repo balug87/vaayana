@@ -1,0 +1,103 @@
+{
+  "format": "vaayana",
+  "formatVersion": 1,
+  "schemaVersion": 2,
+  "exportId": "3d77b8ef-acf6-48cc-984c-18ddfd329c04",
+  "sourceLibraryId": "3f4677ff-a57b-4c84-837b-03654a495e07",
+  "exportedAt": "2026-11-10T14:36:15.294Z",
+  "entities": {
+    "works": [
+      {
+        "title": "The Invented Observatory",
+        "authors": ["M. Example"],
+        "preferredEditionId": "6e429d7e-e7bb-8ba7-b98a-18ec96394369",
+        "initialStatus": "to-read",
+        "catalogFamilyId": "9bccf136-0d7e-8c1d-a8dc-f4367e5d0623",
+        "id": "f205d6e3-60eb-8c18-9644-d0066ff3a173",
+        "revision": "ec50a22b-5f29-4d0b-a91e-4040e69bf7bb",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.278Z",
+        "updatedAt": "2026-11-10T14:36:15.278Z"
+      }
+    ],
+    "editions": [
+      {
+        "workId": "f205d6e3-60eb-8c18-9644-d0066ff3a173",
+        "metadata": {"title": "The Invented Observatory", "authors": ["M. Example"]},
+        "catalogProvenance": [
+          {
+            "catalogId": "312d464e-6688-85f3-8519-0d5b5183c790",
+            "entryId": "6e2c90a5-9719-88c1-a582-54c207586eaf",
+            "originalTitle": "The Invented Observatory",
+            "originalAuthor": "M. Example",
+            "sourceImages": [1],
+            "notes": "Version two source annotation",
+            "unverified": true
+          }
+        ],
+        "id": "6e429d7e-e7bb-8ba7-b98a-18ec96394369",
+        "revision": "5ec5d7cf-d9c4-450c-b66e-aa9abac2be31",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.279Z",
+        "updatedAt": "2026-11-10T14:36:15.279Z"
+      }
+    ],
+    "identifiers": [],
+    "holdings": [],
+    "metadataSnapshots": [],
+    "fieldOverrides": [],
+    "readingCycles": [],
+    "statusEvents": [],
+    "sessions": [],
+    "goals": [],
+    "notes": [],
+    "personalRatings": [],
+    "layerAssignments": [],
+    "tags": [],
+    "tagAssignments": [],
+    "tagRedirects": [],
+    "reviewLinks": [],
+    "ratingSnapshots": [],
+    "interests": [],
+    "recommendationFeedback": [],
+    "settings": [
+      {
+        "value": {
+          "onlineAccess": false,
+          "loadCovers": false,
+          "useLibraryInterests": false,
+          "interests": [],
+          "modelConsent": false,
+          "reducedMotion": false,
+          "view": "shelf",
+          "onboardingComplete": false,
+          "lastExportAt": "2026-11-10T14:36:15.294Z"
+        },
+        "id": "preferences",
+        "revision": "dfad8e47-3fae-4cfc-94a2-0c74380de50a",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.294Z",
+        "updatedAt": "2026-11-10T14:36:15.294Z"
+      }
+    ],
+    "tombstones": [],
+    "mergeLineage": [],
+    "importReceipts": [
+      {
+        "exportId": "024796ca-f78a-8ddc-8295-9ceb54f2685e",
+        "sourceLibraryId": "312d464e-6688-85f3-8519-0d5b5183c790",
+        "catalog": {
+          "actualCount": 1,
+          "unknownAuthorCount": 0,
+          "notes": "Fictional deletion regression.",
+          "unverified": true
+        },
+        "id": "237055c8-ba02-4fb0-8673-920f8363013c",
+        "revision": "d16dc07b-b13c-4ea6-a6bd-8d0a8e894c34",
+        "ancestors": [],
+        "createdAt": "2026-11-10T14:36:15.291Z",
+        "updatedAt": "2026-11-10T14:36:15.291Z"
+      }
+    ]
+  }
+}

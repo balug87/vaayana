@@ -419,7 +419,7 @@ export async function getSnapshot(): Promise<LibrarySnapshot> {
         formats: (['physical', 'digital'] as const).filter((format) => holdings.some((item) => item.format === format)), isbn: identifiers.find((item) => item.scheme === 'isbn')?.value,
         workKey: identifiers.find((item) => item.scheme === 'open-library-work')?.value,
         editionKey: identifiers.find((item) => item.scheme === 'open-library-edition')?.value,
-        status: cycle?.status ?? 'to-read', cycleId: cycle?.id,
+        status: cycle?.status ?? work.initialStatus ?? 'to-read', cycleId: cycle?.id,
         progress: { page: [...sessions].reverse().find((item) => item.page !== undefined && item.editionId === edition.id)?.page,
           percent: [...sessions].reverse().find((item) => item.percent !== undefined && item.editionId === edition.id)?.percent,
           pagesRead: sessions.reduce((total, item) => total + item.pages, 0), minutesRead: sessions.reduce((total, item) => total + item.minutes, 0) },
@@ -432,6 +432,10 @@ export async function getSnapshot(): Promise<LibrarySnapshot> {
         notes: entities.notes.filter((item) => item.workId === work.id).sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)).map((note) => note.text).join('\n\n'),
         personalRating: entities.personalRatings.find((item) => item.workId === work.id)?.value,
         reviewLinks: entities.reviewLinks.filter((item) => item.workId === work.id),
+        catalogProvenance: editions.flatMap((item) => item.catalogProvenance ?? []),
+        catalogSources: entities.importReceipts.filter((receipt) => receipt.catalog &&
+          editions.some((item) => item.catalogProvenance?.some((provenance) => provenance.catalogId === receipt.sourceLibraryId)))
+          .map((receipt) => ({ catalogId: receipt.sourceLibraryId, source: receipt.catalog! })),
         readerRating: entities.ratingSnapshots.find((item) => item.workId === work.id), metadataSnapshot, overrides,
         createdAt: work.createdAt, updatedAt: work.updatedAt,
       };
