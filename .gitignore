@@ -1,0 +1,24 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+.cache/
+coverage/
+private-exports/
+backups/
+*.pem
+*.key
+*.p12
+*.pfx
+*.zip
+# Keep environment-specific QA and raw diagnostics local.
+docs/qa/*
+!docs/qa/desktop-empty.png
+!docs/qa/desktop-library.png
+!docs/qa/mobile-library.png
+!docs/qa/mobile-list.png

@@ -1,0 +1,25 @@
+/* Secondary copy still needs to be legible on warm paper, not merely decorative. */
+:root{--muted:#65715b}
+.small-print,.muted,.eyebrow,.sidebar-caption,.breadcrumb,.breadcrumb strong,.connection-state,
+.page-heading>div>p,.library-summary>div,.summary-note,.welcome-copy p,.welcome-copy .eyebrow,
+.collection-heading p,.collection-heading h2>span,.book-tile-info>span,.book-progress>span,.list-book-name>span,
+.list-book-format,.library-bottom-note p,.library-bottom-note strong,.serif-note,.app-footer,
+.onboarding-notice p,.sidebar-pause>span:last-child,.settings-title p,.setting-toggle small,
+.model-description,.model-spec span,.semantic-message,.rating-card>span,.rating-card>span small,
+.recommendation-reason,.discovery-status,.discovery-tabs small,.layer-card p,.layer-books>span,
+.layers-intro>span,.history-event,.history-event time,.suggestion-row small,.search-result small,
+.search-result>span>span,.dialog-intro,.layer-checkboxes small,.import-conflict>small,
+.notice p,.notice strong,.reading-stats span,.empty-state p,.quiet-note,.counting-rules,
+.empty-shelf-label,.empty-shelf-label>span+span,.empty-book-outline,.shelf-add>span{color:#5f6c55}
+input::placeholder,textarea::placeholder{color:#6b755f}
+.tag,.status-pill,.status-pill.wishlist,.status-pill.paused,.mode-badge,.provider-errors,.offline-status{color:#5e6d50}
+.nav-item,.sidebar-pause p,.onboarding-notice strong,.art-caption,.model-spec strong,.text-link,
+.goal-number>span,.rating-card>strong small,.layer-number,.layer-card p.layer-question,
+.discovery-tabs>button,.offline-status.ready,.status-pill.finished,label,legend{color:#5f6c55}
+.art-book-one span,.art-book-three span{color:#1d2c18}
+.cover-ornament{color:#fbefd5}
+.danger-text{color:#8d5b3e!important}
+.tabs>button{color:#5f6c55}
+.history-topics{margin-top:20px;padding:16px;background:#edf0e2;border:1px solid #dae0cb;border-radius:5px}
+.history-topics .inline-check{margin-top:10px}.history-topics small{display:block;color:#65715b;font-weight:400;margin-top:3px;font-size:9px}
+@media(prefers-contrast:more){:root{--text:#213520;--muted:#3b5032}.small-print,.muted,p,small{color:#3b5032!important}.primary-button{background:#163c25}.cover-type,.cover-type small{color:#fff5dc!important}}

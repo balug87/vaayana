@@ -1,0 +1,22 @@
+{
+  "narrow": { "numFound": 0, "start": 0, "numFoundExact": true, "docs": [] },
+  "broader": {
+    "numFound": 26213,
+    "start": 0,
+    "numFoundExact": true,
+    "docs": [
+      {
+        "key": "/works/OL1W",
+        "title": "Anthropology",
+        "language": ["eng"],
+        "subject": ["Textbooks", "Anthropology", "Anthropology textbooks", "Humanities textbooks", "open_syllabus_project", "Evolucio", "Antropologia", "Kulturalis antropologia", "Kulturanthropologie", "Ember", "Anthropologie", "Anthropology, research", "Anthropology, philosophy", "Anthropology, methodology", "Research", "Philosophy", "Methodology"]
+      },
+      {
+        "key": "/works/OL2W",
+        "title": "Anthropological theory",
+        "language": ["eng"],
+        "subject": ["Anthropology", "Philosophy", "Methodology", "Anthropology, philosophy", "Anthropology, methodology"]
+      }
+    ]
+  }
+}

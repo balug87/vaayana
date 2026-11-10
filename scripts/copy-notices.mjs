@@ -1,0 +1,9 @@
+import { cp, mkdir, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+const root = new URL('../', import.meta.url);
+const destination = new URL('public/notices/', root);
+await mkdir(destination, { recursive: true });
+await cp(new URL('docs/licenses/', root), new URL('licenses/', destination), { recursive: true });
+await cp(new URL('docs/THIRD_PARTY_NOTICES.md', root), new URL('THIRD_PARTY_NOTICES.md', destination));
+await writeFile(new URL('index.html', destination), `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Vaayana · Third-party notices</title><style>body{font-family:system-ui;max-width:760px;padding:30px;margin:auto;line-height:1.8;color:#354d36;background:#faf9ef}a{color:#355b3b}</style><h1>Vaayana third-party notices</h1><p>License copies are included unchanged with this build. The optional model is downloaded only with consent.</p><ul><li><a href="THIRD_PARTY_NOTICES.md">Component versions, attribution, and primary evidence</a></li><li><a href="licenses/APACHE-2.0.txt">Apache 2.0: model, conversion, tokenizer, Transformers.js</a></li><li><a href="licenses/ONNX_RUNTIME_MIT.txt">ONNX Runtime MIT license</a></li><li><a href="licenses/ONNX_RUNTIME_THIRD_PARTY_NOTICES.txt">ONNX Runtime full upstream third-party notices</a></li><li><a href="licenses/HUGGINGFACE_JINJA_MIT.txt">Hugging Face Jinja MIT license</a></li></ul><p><a href="../">Return to Vaayana</a></p></html>`);
+console.log(`Copied third-party notices to ${fileURLToPath(destination)}`);
