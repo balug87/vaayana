@@ -86,7 +86,7 @@ function identityMappings(document: BackupDocument, local: BackupDocument['entit
     assert(matches.size <= 1, 'Ambiguous tag aliases require review before import.');
     if (matches.size) set(tag.id, [...matches][0]);
   }
-  for (const table of ['metadataSnapshots', 'fieldOverrides', 'layerAssignments', 'personalRatings', 'ratingSnapshots', 'tagRedirects'] as const) {
+  for (const table of ['metadataSnapshots', 'fieldOverrides', 'layerAssignments', 'personalRatings', 'ratingSnapshots', 'tagRedirects', 'coverStates'] as const) {
     const naturalKey = (record: Record<string, unknown>, imported: boolean) => {
       const mapped = (field: string) => imported ? map(record[field] as string) : record[field];
       if (table === 'fieldOverrides') return `${mapped('editionId')}:${record.field}`;
@@ -178,7 +178,7 @@ async function stage(document: BackupDocument): Promise<Staged> {
       const archivedConflict = table === 'tags' && localValue.archived === true && incomingValue.archived === false;
       const rejectedConflict = table === 'tagAssignments' && localValue.state === 'rejected' && incomingValue.state !== 'rejected';
       if (!archivedConflict && !rejectedConflict && hasRevision(existing, row.revision)) { preview.counts.unchanged++; continue; }
-      if (archivedConflict || rejectedConflict || !hasRevision(row, existing.revision)) {
+      if (archivedConflict || rejectedConflict || table === 'coverStates' || !hasRevision(row, existing.revision)) {
         const kind = archivedConflict || rejectedConflict ? 'archived' : original.id !== row.id ? 'identity' : 'changed';
         const description = archivedConflict || rejectedConflict ? 'Your local archive/rejection is preserved unless you explicitly restore the imported choice.' :
           kind === 'identity' ? 'An authoritative identifier matches an existing record. Keep local fields or explicitly accept the imported fields.' :
@@ -297,6 +297,7 @@ export async function commitImport(token: string, decisions: ImportDecisions = {
     const changed = { added: 0, updated: 0, deleted: 0 };
     if (staged.preview.alreadyImported) return changed;
     const combined = await readEntities();
+    const receiverCoverConsent = combined.settings.find((row) => row.id === 'preferences')?.value.autoFetchCovers ?? false;
     const initialWorks = new Set(combined.works.map((row) => row.id));
     const initialEditions = new Set(combined.editions.map((row) => row.id));
     const merged = Object.fromEntries(ENTITY_TABLES.map((table) => [table, new Map<string, Row>(combined[table].map((row) => [row.id, row]))])) as Record<EntityTable, Map<string, Row>>;
@@ -323,6 +324,10 @@ export async function commitImport(token: string, decisions: ImportDecisions = {
         const local = current as EntityMap['settings'];
         const lastExportAt = [incoming.value.lastExportAt, local.value.lastExportAt].filter((date): date is string => Boolean(date)).sort().at(-1);
         row = { ...incoming, value: { ...incoming.value, ...(lastExportAt ? { lastExportAt } : {}) } };
+      }
+      if (operation.table === 'settings') {
+        const incoming = row as EntityMap['settings'];
+        row = { ...incoming, value: { ...incoming.value, autoFetchCovers: receiverCoverConsent } };
       }
       const tombstones = tombstoneIndex.get(key(operation.table, row.id)) ?? [];
       if (operation.conflictId) {
@@ -365,6 +370,10 @@ export async function commitImport(token: string, decisions: ImportDecisions = {
     // mappings, tombstones and the next successful-export bookkeeping overhead.
     serializePortableBackup(meta.libraryId, combined, staged.preview.format === 'book-catalog' ? 'The merged catalog' : 'The merged library');
     for (const operation of staged.deletions) if (accepted(operation.conflictId)) await db.entity(operation.table).delete(operation.id);
+    // A imported deletion never leaves an operational lease referencing a vanished work.
+    for (const job of await db.table<import('../domain/types').CoverJob, string>('coverJobs').toArray()) {
+      if (!merged.works.has(job.workId)) await db.table('coverJobs').delete(job.workId);
+    }
     for (const table of ENTITY_TABLES) {
       const rows = staged.puts.filter((operation) => operation.table === table && accepted(operation.conflictId)).map((operation) => {
         const row = merged[table].get(operation.row.id); assert(row, 'Missing staged import row.'); return row;

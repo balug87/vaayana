@@ -42,6 +42,26 @@ For later launches, open Terminal in the existing project folder and run `npm st
 - **Discover** retrieves actual Open Library candidates for two lanes: interest-aligned and interest-expanding. Your explicit interests lead. Consented history signals are broad, visible, removable topics, not raw private purpose text or sensitive labels.
 - **Settings & backup → Export backup** downloads a portable JSON file. Keep it somewhere safe and verify it saved.
 
+## Covers for your whole shelf
+
+1. Open **Settings & backup → Book covers**.
+2. Turn on **Automatically fetch book covers**. This single, explicit choice also enables **Online lookup** and **Load book covers**. It starts off for new and existing users, even if you previously allowed known cover images.
+3. Leave Vaayana open. It checks missing covers on your existing shelf, then newly added or imported books, one provider request at a time. A large shelf can take several minutes. No per-book approval is needed for confident matches.
+
+Only the cover reference changes. Titles, authors, notes, reading history, editions, tags, and other bibliographic facts are not replaced by this process. Known covers and custom photos are skipped. Books without a reliable identifier need an exact, unique title-and-author match; unknown authors, ambiguous matches, missing provider images, and failures remain placeholders instead of guesses.
+
+The same section shows found/already-covered/unmatched/failed/cancelled/remaining counts. **Cancel cover fetching** stays paused across reloads; **Resume cover fetching** continues. **Fetch missing covers** or **Retry unmatched and failed** explicitly revisits unresolved entries. It does not continuously retry failed matches. Internet interruptions pause active work and reconnect safely while the app stays open. If you close the app during an interrupted lookup, that item may need an explicit retry. Storage errors stop processing until you choose an explicit retry.
+
+Turning automatic fetching off stops its lookups and online cover images. Turning **Online lookup** or **Load book covers** off also stops cover work. You can still display already-known covers using your earlier image consent without enabling automatic lookups. Cover images load as they approach the screen, so “found” means a saved cover reference, not that every image has downloaded or will work offline. Cover availability and the exact pictured edition are not guaranteed.
+
+### Use your own cover photo
+
+Open an existing book → **Details → Your cover → Upload photo**. A custom photo always takes priority, including offline and when online cover loading is off. Use **Replace photo** to change it, or **Remove custom cover** to reveal the retained provider cover or placeholder. You do not need to add the book again.
+
+Choose JPEG, PNG, or WebP, up to **10 MiB and 24 megapixels**. HEIC and SVG are not supported. The browser resizes it to at most **512 pixels**, re-encodes a JPEG toward **32 KiB** (hard maximum **64 KiB**), and discards original file metadata such as GPS and the file name. Normalized photos share an **8 MiB** budget and must fit the **20 MiB** full-backup limit. An invalid image, full storage, or a concurrent newer cover leaves the previous cover unchanged.
+
+Your photos stay in local browser storage and are included in exported backups. No photo is sent to Open Library, an AI service, or an application server. Automatic matching sends only book title/author or identifiers to Open Library; its image host also sees cover requests and ordinary network information such as your IP address. This feature does not start recommendations or download the optional AI model.
+
 ## Import a book catalog or backup
 
 In **Settings & backup → Import backup or catalog**, choose one of these two JSON formats:
@@ -55,11 +75,11 @@ The catalog preview shows the **actual** entry count, declared total, unknown au
 
 Once **Offline ready** appears, the format guide, examples, and schemas are cached with the app. The inline example and local file import also work without a network connection. Optional model assets remain excluded from this app-shell download.
 
-Similar titles are skipped by default or explicitly added as separate books, never merged over your saved edits. Imported source text stays **unverified**, separate from your personal diary; entry provenance is visible in the book's **Sources** tab. Repeating the same catalog does not duplicate its books. Changing defaults or downloading a pre-import backup refreshes the preview and requires review again. Cancel saves nothing. Import does not upload the list, look up every title, or start a model download.
+Similar titles are skipped by default or explicitly added as separate books, never merged over your saved edits. Imported source text stays **unverified**, separate from your personal diary; entry provenance is visible in the book's **Sources** tab. Repeating the same catalog does not duplicate its books. Changing defaults or downloading a pre-import backup refreshes the preview and requires review again. Cancel saves nothing. Choosing a file does not upload the list or start lookups/model downloads. Once reviewed books are saved, automatic cover matching can process them only if you previously enabled that explicit opt-in.
 
 All files are limited to **20 MiB of UTF-8 bytes**. Catalogs support up to **10,000 entries**. Unknown fields and unsupported formats are rejected, not silently discarded. The format guide explains field limits and common errors. Use the app exporter for complete backups, rather than hand-writing their internal IDs and records.
 
-**Update before transferring a new backup.** On the receiving device, open Vaayana online and reload the latest app before importing a backup made by this version. Older app copies may reject the new optional catalog-source and starting-shelf fields, even though the backup format/schema labels have not changed. The current app still reads older backups. Keep your original backup if you cannot update yet.
+**Update before transferring a new backup.** Current exports use backup format 1, schema 3, including saved cover choices and local photos. The current app still reads schema 1/2 backups, but older app copies cannot read schema 3. On the receiving device, update Vaayana before importing. Network and automatic-cover consent are device-local: importing a backup never turns them on. Keep your original backup if you cannot update yet.
 
 ## Privacy and backups
 
@@ -96,7 +116,7 @@ License/attribution sources and full copies are in `docs/THIRD_PARTY_NOTICES.md`
 
 ## Reviews and metadata limits
 
-Open Library supplies low-volume public metadata and available **Open Library reader rating** averages/counts with source dates. API requests are cached, throttled, and human-directed. Coverage and cover-image rights are not guaranteed.
+Open Library supplies public metadata and available **Open Library reader rating** averages/counts with source dates. API requests are cached and throttled; automatic missing-cover lookup runs only after explicit opt-in. Coverage and cover-image rights are not guaranteed.
 
 Professional reviews, reader reviews, source rating aggregates, and your notes are separate. Save a review link only after checking it. **Search Goodreads** and **Find a Kirkus review** are search actions, not verified reviews. No scraping, fake snippets, invented consensus, or new Goodreads API-key promise. Full-text review aggregation remains a permission/licensing-gated extension, not a delivered free feature. Google Books is not used.
 
@@ -121,7 +141,7 @@ Source ownership/layout:
 
 ## Verification limits
 
-The build, TypeScript checks, and 160 unit tests pass. The final local-root Chromium run passed 33 checks and intentionally skipped 2 opt-in live provider/model checks. All 11 scoped Pages import checks passed. Earlier baseline runs exercised live metadata and actual local-model inference. See `docs/VALIDATION.md` for coverage and limits rather than treating this README as a universal compatibility claim.
+TypeScript checks, 229 unit tests across 23 files, and both production builds pass. Final local Chrome checks passed 50 root checks (2 intentional live provider/model skips) and all 28 scoped Pages checks. Both builds passed all 17 new cover checks, including real Canvas JPEG/PNG/WebP photo preparation, replacement, offline display, and backup transfer. Earlier baseline checks exercised live metadata and actual local-model inference; those opt-in live checks were not repeated for this release. See `docs/VALIDATION.md` for coverage and limits rather than treating this README as a universal compatibility claim.
 
 The intended broader matrix is Mac Safari/Chrome, Windows Edge/Chrome/Firefox, iPhone Safari, and midrange Android Chrome. Desktop Chromium and emulated mobile checks do not establish results on actual iPhones, low-memory Android devices, Safari, or Windows hardware. GitHub Pages hosts only static files; no paid backend, app-store packaging, or automatic sync is included.
 

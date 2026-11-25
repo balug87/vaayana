@@ -13,6 +13,7 @@ import AddBook from './components/AddBook';
 import BookDetail from './components/BookDetail';
 import { Toast } from './components/ui';
 import { useOffline } from './hooks/useOffline';
+import { useCoverAutomation } from './hooks/useCoverQueue';
 
 const NAV = [
   { id: 'library', name: 'My library', icon: LibraryBig },
@@ -46,9 +47,7 @@ function ReadingRoom() {
   const offline = useOffline();
   const notify = useCallback((text: string) => { clearTimeout(timer.current); setToast(text); timer.current = setTimeout(() => setToast(''), 6500); }, []);
   useEffect(() => { const listener = () => setPage(currentPage()); window.addEventListener('hashchange', listener); return () => window.removeEventListener('hashchange', listener); }, []);
-  useEffect(() => {
-    if (snapshot) setNetworkPreferences({ onlineLookup: snapshot.settings.onlineAccess, covers: snapshot.settings.loadCovers });
-  }, [snapshot?.settings.onlineAccess, snapshot?.settings.loadCovers]);
+  useCoverAutomation(snapshot?.settings);
   useEffect(() => () => clearTimeout(timer.current), []);
   function navigate(next: Page) { location.hash = next; setPage(next); setMobileNav(false); document.getElementById('main-content')?.focus(); }
   if (!snapshot) return <div className="loading-room"><BookOpen size={32} /><span className="brand-word">vaayana<span>·</span></span><p>Opening your reading room…</p></div>;
@@ -75,12 +74,12 @@ function ReadingRoom() {
             {page === 'reading' && <Reading snapshot={snapshot} onSelect={setSelected} onAdd={() => setAdding(true)} notify={notify} />}
             {page === 'discover' && <Discover snapshot={snapshot} notify={notify} onSettings={() => navigate('settings')} />}
             {page === 'layers' && <Layers snapshot={snapshot} onSelect={setSelected} />}
-            {page === 'settings' && <Settings snapshot={snapshot} offline={offline} notify={notify} />}
+            {page === 'settings' && <Settings snapshot={snapshot} offline={offline} notify={notify} onSelectBook={setSelected} />}
           </motion.div>
           <footer className="app-footer"><span><BookOpen size={13} /> vaayana · a life in books</span><span>Made for curiosity, not comparison.</span></footer>
         </main>
       </div>
-      {adding && <AddBook books={snapshot.books} settings={settings} onClose={() => setAdding(false)} onSaved={id => { setAdding(false); setSelected(id); notify('A new book, a new possibility. Saved on this device.'); }} onOnline={async () => { setNetworkPreferences({ onlineLookup: true, covers: settings.loadCovers }); await saveSettings({ onlineAccess: true }); }} />}
+      {adding && <AddBook books={snapshot.books} settings={settings} onClose={() => setAdding(false)} onSaved={id => { setAdding(false); setSelected(id); notify('A new book, a new possibility. Saved on this device.'); }} onOnline={async () => { setNetworkPreferences({ onlineLookup: true, covers: settings.loadCovers, autoFetchCovers: settings.autoFetchCovers }); await saveSettings({ onlineAccess: true }); }} />}
       {book && !adding && <BookDetail key={book.id} book={book} snapshot={snapshot} onClose={() => setSelected(undefined)} notify={notify} />}
       <Toast message={toast} />
     </div>

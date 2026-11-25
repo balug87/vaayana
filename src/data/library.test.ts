@@ -440,11 +440,11 @@ describe('versioned IndexedDB upgrades', () => {
     const tag = stamp({ name: 'Keep', normalizedName: 'keep', kind: 'topic', aliases: [], archived: false, pinned: true });
     await old.table('tags').put(tag); old.close();
     const broken = new Dexie(name); broken.version(2).stores({ ...V1_SCHEMA, tombstones: 'id', mergeLineage: 'id', importReceipts: 'id' });
-    broken.version(3).stores({ tags: 'id' }).upgrade(async (tx) => { await tx.table('tags').clear(); throw new Error('Upgrade failed'); });
+    broken.version(4).stores({ tags: 'id' }).upgrade(async (tx) => { await tx.table('tags').clear(); throw new Error('Upgrade failed'); });
     await expect(broken.open()).rejects.toThrow('Upgrade failed'); broken.close();
     const recovery = JSON.parse(await exportRecoveryBackup(name));
     expect(recovery.format).toBe('vaayana-recovery');
-    expect(recovery.schemaVersion).toBe(2);
+    expect(recovery.schemaVersion).toBe(3);
     expect(recovery.stores.tags[0].name).toBe('Keep');
     const recovered = new LibraryDatabase(name); await recovered.open();
     expect((await recovered.entity('tags').get(tag.id))?.name).toBe('Keep');

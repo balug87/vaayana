@@ -15,9 +15,9 @@ export function ImportFormats() {
   const base = `${import.meta.env.BASE_URL}import-formats/`;
   return <div className="import-format-help">
     <h3>Two accepted JSON formats</h3>
-    <p><strong>Vaayana backup:</strong> an unedited file made with <strong>Export backup</strong>, marked <code>"format": "vaayana"</code> and <code>"formatVersion": 1</code>. It can restore notes, goals, history, settings, and other library records.</p>
+    <p><strong>Vaayana backup:</strong> an unedited file made with <strong>Export backup</strong>, marked <code>"format": "vaayana"</code> and <code>"formatVersion": 1</code>. Current backups use schema version 3 and include saved cover choices and normalized local photos, alongside notes, goals, history, and other library records. Older schema 1/2 backups remain readable. Imported preferences never turn on new cover/network consent.</p>
     <p><strong>Book catalog:</strong> an object with a <code>books</code> array of titles and authors, with optional catalog notes and image references. It adds books, not reading history. An unknown author can be <code>null</code>. You will review import choices before anything is saved.</p>
-    <p className="small-print">A catalog is not a complete backup. No catalog lookup or model download starts when you choose a file. Unknown fields and unsupported versions are rejected rather than silently discarded.</p>
+    <p className="small-print">A catalog is not a complete backup. Choosing a file starts no lookup or model download. After you save reviewed books, missing covers are checked only if you previously opted into automatic cover fetching. Unknown fields and unsupported versions are rejected rather than silently discarded.</p>
     <div className="import-format-links">
       <a href={`${base}index.html`} target="_blank" rel="noopener noreferrer">Read the full import format guide</a>
       <a href={`${base}catalog.example.json`} download>Download catalog example</a>

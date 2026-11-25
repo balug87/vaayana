@@ -8,9 +8,11 @@ import { ErrorMessage } from './ui';
 import { ImportFormats } from './ImportFormats';
 import { ImportReview } from './ImportReview';
 import type { useOffline } from '../hooks/useOffline';
+import { BookCoverSettings } from './BookCoverSettings';
+import { setNetworkPreferences } from '../services/network';
 
 type InstallPrompt = Event & { prompt(): Promise<void>; userChoice: Promise<{ outcome: string }> };
-export default function Settings({ snapshot, offline, notify }: { snapshot: LibrarySnapshot; offline: ReturnType<typeof useOffline>; notify: (text: string) => void }) {
+export default function Settings({ snapshot, offline, notify, onSelectBook }: { snapshot: LibrarySnapshot; offline: ReturnType<typeof useOffline>; notify: (text: string) => void; onSelectBook?: (id: string) => void }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<ImportPreview>();
@@ -41,7 +43,13 @@ export default function Settings({ snapshot, offline, notify }: { snapshot: Libr
     try { await action(); if (message) notify(message); } catch (e) { setError(e instanceof Error ? e.message : 'That action could not finish. Your library has not been replaced.'); }
     finally { setBusy(false); }
   }
-  async function save(patch: Partial<Preferences>) { await run(() => repository.saveSettings(patch)); }
+  async function save(patch: Partial<Preferences>) {
+    if (patch.onlineAccess === false || patch.loadCovers === false) {
+      const next = { ...settings, ...patch };
+      setNetworkPreferences({ onlineLookup: next.onlineAccess, covers: next.loadCovers, autoFetchCovers: next.autoFetchCovers });
+    }
+    await run(() => repository.saveSettings(patch));
+  }
   async function downloadModel() {
     await repository.saveSettings({ modelConsent: true, modelVersion: SEMANTIC_MODEL.revision });
     try {
@@ -86,6 +94,7 @@ export default function Settings({ snapshot, offline, notify }: { snapshot: Libr
     <div className="page-heading"><div><div className="eyebrow"><span /> A FEW THINGS, JUST SO</div><h1>Make it yours<span className="heading-dot">.</span></h1><p>A private library. Thoughtful choices. Nothing hidden.</p></div></div>
     <ErrorMessage message={error} />
     <div className="settings-layout"><div className="settings-main">
+      <BookCoverSettings settings={settings} notify={notify} onSelectBook={onSelectBook} />
       <section className="settings-card" id="backup"><div className="settings-title"><Download size={22} /><div><h2>Keep a little copy</h2><p>Back up your library, or bring it to another device.</p></div></div><div className="notice subtle"><ShieldCheck size={20} /><p>Your library lives in this browser. Storage clearing, eviction, private browsing, or device loss can remove it. Installation isn't a backup. Export a copy you can keep.</p></div><p className="small-print">Last prepared export: {settings.lastExportAt ? new Date(settings.lastExportAt).toLocaleString() : 'Not yet'}. Your downloaded file includes private notes and is not encrypted. Verify that it saved successfully.</p><div className="inline-actions"><button className="primary-button" disabled={busy} onClick={() => void run(exportFile)}><Download size={17} /> Export backup</button><label className="secondary-button file-button"><Upload size={17} /> Import backup or catalog<input aria-label="Import backup or catalog" disabled={busy} type="file" accept=".json,application/json" onChange={e => { void readImport(e.target.files?.[0]); e.target.value = ''; }} /></label></div><p className="small-print">JSON imports · backups use format version 1 · {repository.BACKUP_LIMITS.bytes / 1024 / 1024} MiB total · {repository.BACKUP_LIMITS.records.toLocaleString()} user records plus {repository.BACKUP_LIMITS.provenanceRecords.toLocaleString()} deletion/import records maximum. Backups merge; catalogs add books. Both validate before writing and never replace your library blindly.</p>
         <ImportFormats />
         {preview && <ImportReview preview={preview} decisions={decisions} reviewed={reviewed} busy={busy}

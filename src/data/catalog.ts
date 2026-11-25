@@ -101,7 +101,7 @@ export async function prepareCatalog(value: unknown, options: CatalogImportOptio
   if (source.declaredCount !== undefined && source.declaredCount !== source.actualCount) warnings.push(`Declared count ${source.declaredCount} differs from ${source.actualCount} actual entries. All ${source.actualCount} entries will be considered; none are truncated.`);
   if (source.unknownAuthorCount) warnings.push(`${source.unknownAuthorCount} entries have unknown authors and will keep them unknown.`);
   if (repeated) warnings.push(`${repeated} repeated exact rows remain separate entries. Nothing is silently deduplicated.`);
-  const document: BackupDocument = { format: 'vaayana', formatVersion: 1, schemaVersion: 2, exportId, sourceLibraryId, exportedAt: new Date().toISOString(), entities };
+  const document: BackupDocument = { format: 'vaayana', formatVersion: 1, schemaVersion: 3, exportId, sourceLibraryId, exportedAt: new Date().toISOString(), entities };
   validateEntities(entities);
   return { document, entries, source, defaults: { status, formats }, warnings };
 }

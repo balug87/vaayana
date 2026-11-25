@@ -6,10 +6,10 @@ export const ENTITY_TABLES: EntityTable[] = [
   'readingCycles', 'statusEvents', 'sessions', 'goals', 'notes', 'personalRatings',
   'layerAssignments', 'tags', 'tagAssignments', 'tagRedirects', 'reviewLinks',
   'ratingSnapshots', 'interests', 'recommendationFeedback', 'settings', 'tombstones',
-  'mergeLineage', 'importReceipts',
+  'mergeLineage', 'importReceipts', 'coverStates',
 ];
 export const DEFAULT_SETTINGS: Settings = {
-  onlineAccess: false, loadCovers: false, useLibraryInterests: false, interests: [],
+  onlineAccess: false, loadCovers: false, autoFetchCovers: false, useLibraryInterests: false, interests: [],
   modelConsent: false, reducedMotion: false, view: 'shelf', onboardingComplete: false,
 };
 export const V1_SCHEMA = {
@@ -41,6 +41,7 @@ export class LibraryDatabase extends Dexie {
         tag.aliases ??= [];
       });
     });
+    this.version(3).stores({ coverStates: 'id, &workId', coverJobs: '&workId, status' });
   }
   entity<K extends EntityTable>(name: K): Table<EntityMap[K], string> { return this.table(name); }
 }

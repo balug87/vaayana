@@ -3,7 +3,7 @@ import { DEPLOYMENT_CACHE_PREFIX } from './cache-scope';
 import { abortError, canUseNetwork, delay, getNetworkPreferences, subscribeNetworkPreferences, throwIfAborted } from './network';
 
 export type BookMetadata = MetadataCandidate;
-export interface LookupOptions { signal?: AbortSignal; language?: string; limit?: number; force?: boolean }
+export interface LookupOptions { signal?: AbortSignal; language?: string; limit?: number; force?: boolean; beforeRequest?: () => void | Promise<void> }
 export class MetadataServiceError extends Error {
   constructor(public code: 'OFFLINE' | 'TIMEOUT' | 'HTTP' | 'INVALID_QUERY' | 'NOT_FOUND' | 'INVALID_RESPONSE', message: string, public status?: number) {
     super(message); this.name = 'MetadataServiceError';
@@ -112,7 +112,9 @@ export class MetadataClient {
           } catch { /* Storage may be unavailable in private browsing. */ }
         }
         await delay(this.nextRequest - Date.now(), controller.signal);
+        await options.beforeRequest?.();
         throwIfAborted(controller.signal);
+        if (!canUseNetwork()) throw new MetadataServiceError('OFFLINE', 'Online lookup has been turned off.');
         this.nextRequest = Date.now() + this.interval;
         if (this.interval >= 1000) {
           try { localStorage.setItem(THROTTLE_KEY, String(Date.now())); } catch { /* In-tab queue remains active. */ }

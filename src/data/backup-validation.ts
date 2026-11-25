@@ -2,6 +2,7 @@ import type { BackupDocument, EntityMap, EntityTable } from '../domain/types';
 import { LAYERS } from '../domain/layers';
 import { ENTITY_TABLES } from './db';
 import { assert, METADATA_FIELDS, normalizeIsbn, positive, safeUrl, STATUSES, textValue, validDate } from './validation';
+import { COVER_LIMITS, validateUploadedCover } from './cover-validation';
 
 export const BACKUP_LIMITS = { bytes: 20 * 1024 * 1024, records: 50_000, provenanceRecords: 100_000, stringLength: 20_000, arrayLength: 10_000, depth: 16 } as const;
 const PROVENANCE_TABLES: EntityTable[] = ['tombstones', 'mergeLineage', 'importReceipts'];
@@ -48,7 +49,12 @@ const origin = choices('user', 'provider', 'rule', 'model');
 const settings: Validator = (value) => shape(value, {
   onlineAccess: bool, loadCovers: bool, useLibraryInterests: bool, interests: array(short, 100), modelConsent: bool,
   reducedMotion: bool, view: choices('shelf', 'list'), onboardingComplete: bool,
-}, { modelVersion: short, lastExportAt: date });
+}, { modelVersion: short, lastExportAt: date, autoFetchCovers: bool });
+const uploaded: Validator = (value) => {
+  shape(value, { mime: choices('image/jpeg'), width: integer, height: integer, byteLength: integer,
+    jpegBase64: (v) => textValue(v, 'cover encoding', COVER_LIMITS.base64Length) });
+  validateUploadedCover(value as import('../domain/types').UploadedCover);
+};
 const catalogSource: Validator = (value) => shape(value, {
   actualCount: integer, unknownAuthorCount: integer, unverified: choices(true),
 }, { declaredCount: integer, notes: str });
@@ -57,6 +63,10 @@ const catalogProvenance: Validator = (value) => shape(value, {
   sourceImages: array(integer, BACKUP_LIMITS.arrayLength), unverified: choices(true),
 }, { notes: str });
 const definitions: Record<EntityTable, [Shape, Shape?]> = {
+  coverStates: [{ workId: id }, { uploaded, provider: (v) => shape(v, {
+    coverId: (n) => { integer(n); assert((n as number) > 0, 'Invalid provider cover ID.'); },
+    source: choices('open-library'), fetchedAt: date,
+  }) }],
   works: [{ title: str, authors: array(short) }, { preferredEditionId: id, initialStatus: choices('to-read', 'wishlist'), catalogFamilyId: id }],
   editions: [{ workId: id, metadata }, { catalogProvenance: array(catalogProvenance, BACKUP_LIMITS.arrayLength) }],
   identifiers: [{ entityId: id, entityType: choices('work', 'edition'), scheme: choices('isbn', 'open-library-work', 'open-library-edition'), value: short }],
@@ -84,16 +94,21 @@ const definitions: Record<EntityTable, [Shape, Shape?]> = {
   mergeLineage: [{ sourceLibraryId: id, sourceEntityId: (v) => { if (v !== 'preferences') id(v); }, localEntityId: (v) => { if (v !== 'preferences') id(v); }, sourceRevision: id }],
   importReceipts: [{ exportId: id, sourceLibraryId: id }, { catalog: catalogSource }],
 };
-function inspectTree(value: unknown, depth = 0, entityStore = false): void {
+function inspectTree(value: unknown, depth = 0, entityStore = false, path: string[] = []): void {
   assert(depth <= BACKUP_LIMITS.depth, 'Backup nesting exceeds the safe limit.');
-  if (typeof value === 'string') { str(value); return; }
+  if (typeof value === 'string') {
+    // A narrowly scoped exception, never accept an arbitrary image string or data URL.
+    if (path.join('.') === 'entities.coverStates.*.uploaded.jpegBase64') textValue(value, 'cover encoding', COVER_LIMITS.base64Length);
+    else str(value);
+    return;
+  }
   if (Array.isArray(value)) {
     assert(value.length <= (entityStore ? BACKUP_LIMITS.provenanceRecords : BACKUP_LIMITS.arrayLength), 'Backup array exceeds the safe limit.');
-    value.forEach((child) => inspectTree(child, depth + 1)); return;
+    value.forEach((child) => inspectTree(child, depth + 1, false, [...path, '*'])); return;
   }
   if (value && typeof value === 'object') for (const [key, child] of Object.entries(value)) {
     assert(!['__proto__', 'prototype', 'constructor'].includes(key), 'Unsafe object key in backup.');
-    inspectTree(child, depth + 1, depth === 1 && ENTITY_TABLES.includes(key as EntityTable));
+    inspectTree(child, depth + 1, depth === 1 && ENTITY_TABLES.includes(key as EntityTable), [...path, key]);
   }
 }
 export function validateEntities(entities: BackupDocument['entities']): void {
@@ -101,6 +116,7 @@ export function validateEntities(entities: BackupDocument['entities']): void {
   assert(Object.keys(entityObject).length === ENTITY_TABLES.length, 'Backup entity stores do not match the supported schema.');
   let count = 0;
   let provenanceCount = 0;
+  let photoBytes = 0;
   const globalIds = new Set<string>();
   for (const table of ENTITY_TABLES) {
     const rows = entityObject[table]; assert(Array.isArray(rows), `Missing ${table} store.`);
@@ -126,6 +142,10 @@ export function validateEntities(entities: BackupDocument['entities']): void {
         assert(record.entityType === (record.scheme === 'open-library-work' ? 'work' : 'edition'), 'Identifier entity type is inconsistent.');
       }
       if (table === 'goals') assert((record.startDate as string) <= (record.endDate as string), 'Invalid goal period.');
+      if (table === 'coverStates' && record.uploaded) {
+        photoBytes += (record.uploaded as import('../domain/types').UploadedCover).byteLength;
+        assert(photoBytes <= COVER_LIMITS.totalPhotoBytes, 'Uploaded covers exceed the 8 MiB total photo budget. Remove a photo or use smaller images.');
+      }
       if (table === 'tags') assert(record.normalizedName === (record.name as string).normalize('NFKC').trim().toLocaleLowerCase(), 'Tag normalized name is inconsistent.');
     }
   }
@@ -140,6 +160,7 @@ export function validateEntities(entities: BackupDocument['entities']): void {
   unique('layerAssignments', (r) => String(r.workId));
   unique('personalRatings', (r) => String(r.workId));
   unique('ratingSnapshots', (r) => String(r.workId));
+  unique('coverStates', (r) => String(r.workId));
   unique('tags', (r) => String(r.normalizedName));
   unique('tagRedirects', (r) => String(r.fromTagId));
   const requireRelation = (table: EntityTable, id: string) => assert(maps[table].has(id), `Broken ${table} relationship.`);
@@ -180,7 +201,7 @@ export function parseImportJson(text: string): unknown {
 }
 export function parseBackup(text: string): BackupDocument {
   const parsed = parseImportJson(text);
-  shape(parsed, { format: choices('vaayana'), formatVersion: choices(1), schemaVersion: choices(1, 2), exportId: id, sourceLibraryId: id, exportedAt: date, entities: (value) => { object(value); } });
+  shape(parsed, { format: choices('vaayana'), formatVersion: choices(1), schemaVersion: choices(1, 2, 3), exportId: id, sourceLibraryId: id, exportedAt: date, entities: (value) => { object(value); } });
   const document = parsed as BackupDocument;
   // Version 1 predates deletion lineage. It remains importable without resetting any database.
   if (document.schemaVersion === 1) {
@@ -188,6 +209,12 @@ export function parseBackup(text: string): BackupDocument {
     document.entities.mergeLineage ??= [];
     document.entities.importReceipts ??= [];
     document.schemaVersion = 2;
+  }
+  if (document.schemaVersion < 3) {
+    assert(!Object.hasOwn(document.entities, 'coverStates'), 'Cover records require backup schema version 3.');
+    assert(document.entities.settings.every((row) => !Object.hasOwn(row.value, 'autoFetchCovers')), 'Automatic cover settings require backup schema version 3.');
+    document.entities.coverStates = [];
+    document.schemaVersion = 3;
   }
   validateEntities(document.entities);
   return document;

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getNetworkPreferences, subscribeNetworkPreferences } from '../services/network';
 
 /** Fetch only near the viewport, with cancellation owned by this mounted image. */
 export function CoverImage({ src }: { src: string }) {
@@ -9,8 +10,10 @@ export function CoverImage({ src }: { src: string }) {
     let objectUrl: string | undefined;
     let started = false;
     let disposed = false;
+    const permitted = () => { const settings = getNetworkPreferences(); return settings.onlineLookup && settings.covers; };
+    const unsubscribe = subscribeNetworkPreferences(() => { if (!permitted()) { disposed = true; controller.abort(); image.removeAttribute('src'); if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = undefined; } } });
     async function load() {
-      if (started || disposed) return;
+      if (started || disposed || !permitted()) return;
       started = true;
       try {
         const response = await fetch(src, { mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer', signal: controller.signal });
@@ -24,9 +27,10 @@ export function CoverImage({ src }: { src: string }) {
     const observer = typeof IntersectionObserver === 'undefined' ? undefined : new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) { observer?.disconnect(); void load(); }
     }, { rootMargin: '150px' });
-    observer?.observe(image);
+    if (observer) observer.observe(image); else void load();
     return () => {
       disposed = true;
+      unsubscribe();
       observer?.disconnect();
       controller.abort();
       image.removeAttribute('src');

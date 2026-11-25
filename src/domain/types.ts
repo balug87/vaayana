@@ -71,6 +71,7 @@ export interface Interest extends Revision { name: string; }
 export interface RecommendationFeedback extends Revision { workKey: string; action: 'dismiss' | 'less-like-this'; topics: string[]; }
 export interface RatingSnapshot extends Revision { workId: ID; source: 'open-library'; average: number; count: number; fetchedAt: string; }
 export interface Settings {
+  autoFetchCovers?: boolean;
   onlineAccess: boolean;
   loadCovers: boolean;
   useLibraryInterests: boolean;
@@ -87,6 +88,7 @@ export interface Tombstone extends Revision { table: EntityTable; entityId: ID; 
 export interface MergeLineage extends Revision { sourceLibraryId: ID; sourceEntityId: ID; localEntityId: ID; sourceRevision: ID; }
 export interface ImportReceipt extends Revision { exportId: ID; sourceLibraryId: ID; catalog?: CatalogSource; }
 export interface EntityMap {
+  coverStates: CoverState;
   works: Work; editions: Edition; identifiers: Identifier; holdings: Holding;
   metadataSnapshots: MetadataSnapshot; fieldOverrides: FieldOverride;
   readingCycles: ReadingCycle; statusEvents: StatusEvent; sessions: ReadingSession;
@@ -98,6 +100,7 @@ export interface EntityMap {
 }
 export type EntityTable = keyof EntityMap;
 export interface Book extends MetadataFields {
+  cover?: CoverDescriptor;
   id: ID;
   workId: ID;
   editionId: ID;
@@ -219,3 +222,43 @@ export interface CatalogImportPreview extends ImportPreviewBase {
 }
 export type ImportPreview = BackupImportPreview | CatalogImportPreview;
 export type ImportDecisions = Record<string, 'keep-local' | 'use-import'>;
+
+export interface UploadedCover {
+  mime: 'image/jpeg';
+  width: number;
+  height: number;
+  byteLength: number;
+  jpegBase64: string;
+}
+export interface ProviderCover { coverId: number; source: 'open-library'; fetchedAt: string; }
+/** Portable chosen cover only. Jobs, leases and network consent are device-local. */
+export interface CoverState extends Revision { workId: ID; uploaded?: UploadedCover; provider?: ProviderCover; }
+export type CoverDescriptor =
+  | { kind: 'none'; revision?: string }
+  | { kind: 'provider'; coverId: number; revision?: string }
+  | { kind: 'uploaded'; revision: string; mime: 'image/jpeg'; width: number; height: number; byteLength: number };
+/** Only bibliographic query fields. Never pass a full Book to cover services. */
+export interface CoverLookupTarget {
+  workId: ID; editionId: ID; title: string; authors: string[];
+  isbn?: string; workKey?: string; editionKey?: string;
+  queryFingerprint: string; coverRevision: string | null; cover: CoverDescriptor;
+}
+export type CoverFailureCode = 'network' | 'no-match' | 'ambiguous' | 'cancelled' | 'interrupted' | 'storage' | 'invalid-result';
+export interface CoverJob {
+  workId: ID;
+  queryFingerprint: string;
+  attemptId: ID;
+  generation: number;
+  expectedCoverRevision: string | null;
+  manual: boolean;
+  status: 'running' | 'found' | 'no-match' | 'failed' | 'cancelled';
+  startedAt: string;
+  leaseUntil: number;
+  completedAt?: string;
+  failureCode?: CoverFailureCode;
+}
+export interface CoverQueueSnapshot { paused: boolean; generation: number; jobs: CoverJob[]; }
+export interface CoverLookupClaim { attemptId: ID; target: CoverLookupTarget; }
+export type CoverLookupResult =
+  | { status: 'found'; coverId: number }
+  | { status: 'no-match' | 'failed' | 'cancelled'; failureCode?: CoverFailureCode };

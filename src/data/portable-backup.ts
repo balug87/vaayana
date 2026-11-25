@@ -9,7 +9,7 @@ export function serializePortableBackup(libraryId: string, entities: BackupDocum
   const previous = entities.settings.find((row) => row.id === 'preferences');
   const preferences = { ...stamp({ value: { ...DEFAULT_SETTINGS, ...previous?.value, lastExportAt: exportedAt } }, previous), id: 'preferences' };
   const document: BackupDocument = {
-    format: 'vaayana', formatVersion: 1, schemaVersion: 2,
+    format: 'vaayana', formatVersion: 1, schemaVersion: 3,
     exportId: newId(), sourceLibraryId: libraryId, exportedAt,
     entities: { ...entities, settings: [preferences] },
   };

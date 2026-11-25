@@ -7,6 +7,7 @@ import { LAYERS } from '../domain/layers';
 import { db, DEFAULT_SETTINGS, getMeta, mutate, readEntities, removeEntity, stamp } from './db';
 import { assert, METADATA_FIELDS, normalizeIsbn, positive, safeUrl, STATUSES, textValue, validDate, validateMetadata } from './validation';
 import { validateCandidate } from './backup-validation';
+import { describeCover } from './covers';
 export { normalizeIsbn } from './validation';
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -200,6 +201,9 @@ export async function deleteBook(workId: ID): Promise<void> {
     }
     for (const record of await db.entity('identifiers').toArray()) if (record.entityId === workId || editions.includes(record.entityId)) await removeEntity('identifiers', record.id);
     for (const id of editions) await removeEntity('editions', id);
+    const cover = await db.entity('coverStates').where('workId').equals(workId).first();
+    if (cover) await removeEntity('coverStates', cover.id);
+    await db.table('coverJobs').delete(workId);
     await removeEntity('works', workId);
   });
 }
@@ -387,7 +391,14 @@ export async function saveSettings(patch: Partial<Settings>): Promise<void> {
   await mutate(async () => {
     const previous = await db.entity('settings').get('preferences');
     const value = { ...DEFAULT_SETTINGS, ...previous?.value, ...patch };
-    for (const key of ['onlineAccess', 'loadCovers', 'useLibraryInterests', 'modelConsent', 'reducedMotion', 'onboardingComplete'] as const) assert(typeof value[key] === 'boolean', 'Invalid settings.');
+    for (const key of ['onlineAccess', 'loadCovers', 'autoFetchCovers', 'useLibraryInterests', 'modelConsent', 'reducedMotion', 'onboardingComplete'] as const) assert(typeof value[key] === 'boolean', 'Invalid settings.');
+    if (!value.onlineAccess || !value.loadCovers || !value.autoFetchCovers) {
+      for (const job of await db.table<import('../domain/types').CoverJob, string>('coverJobs').where('status').equals('running').toArray()) {
+        if (!value.onlineAccess || !value.loadCovers || !job.manual) {
+          await db.table('coverJobs').put({ ...job, status: 'cancelled', failureCode: 'cancelled', completedAt: new Date().toISOString() });
+        }
+      }
+    }
     assert(value.view === 'shelf' || value.view === 'list', 'Invalid library view.');
     assert(Array.isArray(value.interests) && value.interests.length <= 100, 'Invalid interests.');
     value.interests.forEach((interest) => textValue(interest, 'interest', 200));
@@ -399,6 +410,7 @@ export async function saveSettings(patch: Partial<Settings>): Promise<void> {
 export async function getSnapshot(): Promise<LibrarySnapshot> {
   return db.transaction('r', db.tables, async () => {
     const entities = await readEntities(); const meta = (await db.meta.get('library')) ?? { libraryId: '', revision: 0 };
+    const covers = new Map(entities.coverStates.map((row) => [row.workId, row]));
     const books: Book[] = entities.works.map((work) => {
       const editions = entities.editions.filter((item) => item.workId === work.id).sort((a, b) =>
         Number(b.id === work.preferredEditionId) - Number(a.id === work.preferredEditionId) || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
@@ -415,7 +427,7 @@ export async function getSnapshot(): Promise<LibrarySnapshot> {
       const assignments = entities.tagAssignments.filter((item) => item.workId === work.id);
       const activeTags = entities.tags.filter((tag) => !tag.archived);
       const identifiers = entities.identifiers.filter((item) => item.entityId === work.id || item.entityId === edition.id);
-      return { ...metadata, id: work.id, workId: work.id, editionId: edition.id, editions, holdings,
+      return { ...metadata, cover: describeCover(covers.get(work.id), metadata.coverId), id: work.id, workId: work.id, editionId: edition.id, editions, holdings,
         formats: (['physical', 'digital'] as const).filter((format) => holdings.some((item) => item.format === format)), isbn: identifiers.find((item) => item.scheme === 'isbn')?.value,
         workKey: identifiers.find((item) => item.scheme === 'open-library-work')?.value,
         editionKey: identifiers.find((item) => item.scheme === 'open-library-edition')?.value,

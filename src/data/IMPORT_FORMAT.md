@@ -120,7 +120,7 @@ A canonical backup has these root fields:
 
 - `format: "vaayana"`
 - `formatVersion: 1`
-- `schemaVersion: 1` or `2` (current exports use `2`)
+- `schemaVersion: 1`, `2` or `3` (current exports use `3`)
 - `exportId`, `sourceLibraryId`, `exportedAt`
 - `entities`, containing the supported named stores and typed records
 
@@ -128,6 +128,61 @@ Canonical backups retain their stricter field, version, relationship, HTTPS URL,
 UUID, checksum, revision and tombstone checks. A malformed backup is **not**
 reinterpreted as a catalog to bypass those checks. Unknown versions/fields do not
 silently import. Exported files contain sensitive diary data and are not encrypted.
+
+### Uploaded and fetched covers in schema 3
+
+Version 3 adds the portable `coverStates` store, keyed by a stable UUID and related
+to one work. A chosen provider cover contains only an Open Library cover ID,
+source and retrieval date. A local uploaded cover contains a prepared JPEG,
+dimensions and byte count. Original source filenames and EXIF metadata are not
+retained. Uploaded photos take precedence; removing one preserves the record's
+revision history and reveals any provider/bibliographic fallback.
+
+The UI accepts JPEG, PNG or WebP input up to **10 MiB / 24 million pixels**, then
+decodes and re-encodes it as JPEG with at most **512 pixels on the longest edge**.
+It targets **32 KiB** with a hard **64 KiB** normalized-photo limit. Only that
+prepared raster is saved. SVG, GIF, HEIC, arbitrary image/data URLs, EXIF-bearing
+JPEGs and malformed/incomplete JPEG headers are not portable upload formats.
+Import validates bounded JPEG segments, real quantization/Huffman definitions,
+component/table references, supported scan structure, actual dimensions and bytes.
+The canonical base64 exception applies only to
+`entities.coverStates[].uploaded.jpegBase64`, with a maximum of 87,384 characters;
+it does not relax text limits or accept other image strings.
+
+All normalized photos share an **8 MiB total** budget, while the entire portable
+backup still must fit **20 MiB of UTF-8**. Base64 adds about one third: 128 photos at
+the maximum 64 KiB consume approximately 10.67 MiB of JSON image strings, before
+records and diary. The exact whole-library serializer is checked before each
+cover save or import commit. An over-limit or quota-failed operation retains the
+previous photo and library. No image data is silently dropped to meet a limit.
+
+Photos are sensitive and unencrypted in exported backups. Image bytes are never
+sent to bibliographic services. Shelf snapshots expose a descriptor, not base64;
+local photos are retrieved as Blob objects and can render offline with all online
+cover settings disabled.
+
+Database upgrades from versions 1/2 add the stores transactionally without deleting
+or rebuilding the existing library. Backups from versions 1/2 remain importable,
+with an empty cover store added during staging. **Older Vaayana releases cannot
+import a version-3 backup**; update the receiving app first. New cover fields are
+not disguised as version 2. Public schemas and the exported fictional example
+reflect the actual version-3 format.
+
+`coverJobs` and device pause state are operational, **not** portable user data:
+claims, attempts, leases, failures and pause controls are not exported or imported.
+The automatic-fetch setting is receiver consent. Import never enables it:
+a fresh receiver remains off and an existing receiver keeps its own choice,
+regardless of settings/conflict choices in the file. With prior explicit opt-in,
+newly imported catalog entries may become eligible for the local cover queue.
+Catalog import itself creates no reading events or inferred bibliographic facts.
+
+Queue claims are atomic across books/tabs; only one unexpired job may run. Checks
+before each request and before saving results use current saved query fields,
+attempt ID, lease, device generation, consent and expected cover revision. Pausing,
+uploading, deleting or editing the book prevents a stale result from being saved.
+Pause survives unrelated edits/reloads/imports. Terminal failed/no-match/cancelled
+jobs do not automatically repeat for the same query; use explicit retry/resume.
+Expired leases become interrupted/cancelled, never silently reclaimed.
 
 ## Common errors
 

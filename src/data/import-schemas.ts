@@ -49,6 +49,14 @@ const candidate = object({
   rating: object({ source: { const: 'Open Library reader rating' }, average: num(5), count: int(), fetchedAt: ref('date') }),
 });
 const entityDefinitions: Record<string, Schema> = {
+  coverStates: row({ workId: ref('uuid') }, {
+    uploaded: object({ mime: { const: 'image/jpeg' }, width: { ...int(512), minimum: 1 }, height: { ...int(512), minimum: 1 },
+      byteLength: { ...int(65_536), minimum: 1 },
+      jpegBase64: { ...text(87_384), pattern: '^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$',
+        description: 'Prepared JPEG bytes only. The importer checks canonical base64, byte count, bounded JPEG segments/dimensions and an 8 MiB aggregate photo budget. No SVG, URLs, EXIF or original filenames.' },
+    }),
+    provider: object({ coverId: { ...int(), minimum: 1 }, source: { const: 'open-library' }, fetchedAt: ref('date') }),
+  }),
   works: row({ title: text(), authors: list(text(500)) }, { preferredEditionId: ref('uuid'), initialStatus: enumeration('to-read', 'wishlist'), catalogFamilyId: ref('uuid') }),
   editions: row({ workId: ref('uuid'), metadata: ref('metadata') }, { catalogProvenance: list(ref('catalogProvenance'), 10_000) }),
   identifiers: {
@@ -94,7 +102,7 @@ const entityDefinitions: Record<string, Schema> = {
     onlineAccess: { type: 'boolean' }, loadCovers: { type: 'boolean' }, useLibraryInterests: { type: 'boolean' },
     interests: list(text(500), 100), modelConsent: { type: 'boolean' }, reducedMotion: { type: 'boolean' },
     view: enumeration('shelf', 'list'), onboardingComplete: { type: 'boolean' },
-  }, { modelVersion: text(500), lastExportAt: ref('date') }) }),
+  }, { modelVersion: text(500), lastExportAt: ref('date'), autoFetchCovers: { type: 'boolean' } }) }),
   tombstones: row({ table: {}, entityId: preferencesId, deletedRevision: ref('uuid') }, { catalogFamilyId: ref('uuid') }),
   mergeLineage: row({ sourceLibraryId: ref('uuid'), sourceEntityId: preferencesId, localEntityId: preferencesId, sourceRevision: ref('uuid') }),
   importReceipts: row({ exportId: ref('uuid'), sourceLibraryId: ref('uuid') }, { catalog: ref('catalogSource') }),
@@ -102,17 +110,25 @@ const entityDefinitions: Record<string, Schema> = {
 const provenance = ['tombstones', 'mergeLineage', 'importReceipts'];
 (entityDefinitions.tombstones.properties as Record<string, Schema>).table = enumeration(...Object.keys(entityDefinitions).filter((table) => !provenance.includes(table)));
 const stores = Object.fromEntries(Object.keys(entityDefinitions).map((name) => [name, list(ref(name), provenance.includes(name) ? 100_000 : 50_000)]));
-const requiredStores = Object.fromEntries(Object.entries(stores).filter(([name]) => !provenance.includes(name)));
-const optionalStores = Object.fromEntries(Object.entries(stores).filter(([name]) => provenance.includes(name)));
+const requiredStores = Object.fromEntries(Object.entries(stores).filter(([name]) => !provenance.includes(name) && name !== 'coverStates'));
+const optionalStores = Object.fromEntries(Object.entries(stores).filter(([name]) => provenance.includes(name) || name === 'coverStates'));
 export const BACKUP_SCHEMA: Schema = {
   $schema: 'http://json-schema.org/draft-07/schema#', $id: 'urn:vaayana:import:backup',
-  title: 'Vaayana canonical backup, format 1 / schema 1 or 2',
+  title: 'Vaayana canonical backup, format 1 / schema 1, 2 or 3',
   description: 'Export this format from Vaayana rather than constructing it manually. This schema defines allowed fields and local shapes. Import additionally enforces 20 MiB UTF-8, 50000 total owned records, 100000 total provenance records, UTF-16 text lengths/depth/hostile-key rules, UUID/ISBN semantics, unique identities, normalized tags, relationships, goal/calendar validity, revision ancestry and safe URL parsing. Canonical backups are never reinterpreted as external catalogs.',
   ...object({
-    format: { const: 'vaayana' }, formatVersion: { const: 1 }, schemaVersion: { enum: [1, 2] },
+    format: { const: 'vaayana' }, formatVersion: { const: 1 }, schemaVersion: { enum: [1, 2, 3] },
     exportId: ref('uuid'), sourceLibraryId: ref('uuid'), exportedAt: ref('date'),
     entities: object(requiredStores, optionalStores),
   }),
-  allOf: [{ if: { properties: { schemaVersion: { const: 2 } } }, then: { properties: { entities: { required: provenance } } } }],
+  allOf: [
+    { if: { properties: { schemaVersion: { enum: [2, 3] } } }, then: { properties: { entities: { required: provenance } } } },
+    { if: { properties: { schemaVersion: { const: 3 } } },
+      then: { properties: { entities: { required: ['coverStates'] } } },
+      else: { properties: { entities: { properties: {
+        coverStates: false, settings: { items: { properties: { value: { properties: { autoFetchCovers: false } } } } },
+      } } } },
+    },
+  ],
   definitions: { uuid, date, httpsUrl: url, metadata: object(metadataRequired, metadataOptional), candidate, catalogSource, catalogProvenance, ...entityDefinitions },
 };

@@ -3,12 +3,14 @@ import { createElement } from 'react';
 import { cleanup, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BookCover } from './ui';
+import { setNetworkPreferences } from '../services/network';
 
 let visible: () => void;
 const disconnect = vi.fn();
 const createObjectURL = vi.fn(() => 'blob:local-cover');
 const revokeObjectURL = vi.fn();
 beforeEach(() => {
+  setNetworkPreferences({ onlineLookup: true, covers: true });
   vi.stubGlobal('IntersectionObserver', class {
     constructor(callback: IntersectionObserverCallback) { visible = () => callback([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver); }
     observe() {}
@@ -17,7 +19,7 @@ beforeEach(() => {
   vi.stubGlobal('URL', { createObjectURL, revokeObjectURL });
   createObjectURL.mockClear(); revokeObjectURL.mockClear(); disconnect.mockClear();
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); setNetworkPreferences({ onlineLookup: false, covers: false }); });
 const book = { title: 'A local book', authors: ['Author'], coverId: 123 };
 describe('owned lazy cover request lifecycle', () => {
   it('makes no request by default or before the image is near the viewport, then aborts when covers turn off', () => {

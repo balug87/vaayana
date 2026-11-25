@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "urn:vaayana:import:backup",
-  "title": "Vaayana canonical backup, format 1 / schema 1 or 2",
+  "title": "Vaayana canonical backup, format 1 / schema 1, 2 or 3",
   "description": "Export this format from Vaayana rather than constructing it manually. This schema defines allowed fields and local shapes. Import additionally enforces 20 MiB UTF-8, 50000 total owned records, 100000 total provenance records, UTF-16 text lengths/depth/hostile-key rules, UUID/ISBN semantics, unique identities, normalized tags, relationships, goal/calendar validity, revision ancestry and safe URL parsing. Canonical backups are never reinterpreted as external catalogs.",
   "type": "object",
   "additionalProperties": false,
@@ -24,7 +24,8 @@
     "schemaVersion": {
       "enum": [
         1,
-        2
+        2,
+        3
       ]
     },
     "exportId": {
@@ -210,6 +211,13 @@
           },
           "maxItems": 50000
         },
+        "coverStates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coverStates"
+          },
+          "maxItems": 50000
+        },
         "tombstones": {
           "type": "array",
           "items": {
@@ -239,7 +247,10 @@
       "if": {
         "properties": {
           "schemaVersion": {
-            "const": 2
+            "enum": [
+              2,
+              3
+            ]
           }
         }
       },
@@ -251,6 +262,44 @@
               "mergeLineage",
               "importReceipts"
             ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "entities": {
+            "required": [
+              "coverStates"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "entities": {
+            "properties": {
+              "coverStates": false,
+              "settings": {
+                "items": {
+                  "properties": {
+                    "value": {
+                      "properties": {
+                        "autoFetchCovers": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -536,6 +585,101 @@
         "notes": {
           "type": "string",
           "maxLength": 20000
+        }
+      }
+    },
+    "coverStates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "ancestors",
+        "createdAt",
+        "updatedAt",
+        "workId"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "revision": {
+          "$ref": "#/definitions/uuid"
+        },
+        "ancestors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/uuid"
+          },
+          "maxItems": 10000
+        },
+        "createdAt": {
+          "$ref": "#/definitions/date"
+        },
+        "updatedAt": {
+          "$ref": "#/definitions/date"
+        },
+        "workId": {
+          "$ref": "#/definitions/uuid"
+        },
+        "uploaded": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mime",
+            "width",
+            "height",
+            "byteLength",
+            "jpegBase64"
+          ],
+          "properties": {
+            "mime": {
+              "const": "image/jpeg"
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 512
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 512
+            },
+            "byteLength": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "jpegBase64": {
+              "type": "string",
+              "maxLength": 87384,
+              "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+              "description": "Prepared JPEG bytes only. The importer checks canonical base64, byte count, bounded JPEG segments/dimensions and an 8 MiB aggregate photo budget. No SVG, URLs, EXIF or original filenames."
+            }
+          }
+        },
+        "provider": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverId",
+            "source",
+            "fetchedAt"
+          ],
+          "properties": {
+            "coverId": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000000
+            },
+            "source": {
+              "const": "open-library"
+            },
+            "fetchedAt": {
+              "$ref": "#/definitions/date"
+            }
+          }
         }
       }
     },
@@ -2008,6 +2152,9 @@
             },
             "lastExportAt": {
               "$ref": "#/definitions/date"
+            },
+            "autoFetchCovers": {
+              "type": "boolean"
             }
           }
         }
@@ -2048,6 +2195,7 @@
         },
         "table": {
           "enum": [
+            "coverStates",
             "works",
             "editions",
             "identifiers",

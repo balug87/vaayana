@@ -7,6 +7,7 @@ import { refreshMetadata, searchBooks } from '../services';
 import { BookCover, ErrorMessage, ExternalLink, Modal, Progress, STATUS_NAMES } from './ui';
 import { useSyncedDraft } from '../hooks/useSyncedDraft';
 import { bookDetailsPatch, metadataLookupQuery } from '../ui/bookDetailsPatch';
+import { BookCoverPhoto } from './BookCoverPhoto';
 
 export function today() { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
 export default function BookDetail({ book, snapshot, onClose, notify }: { book: Book; snapshot: LibrarySnapshot; onClose: () => void; notify: (text: string) => void }) {
@@ -55,6 +56,7 @@ export default function BookDetail({ book, snapshot, onClose, notify }: { book: 
     <div className="detail-hero"><BookCover book={book} covers={snapshot.settings.onlineAccess && snapshot.settings.loadCovers} /><div><span className={`status-pill ${book.status}`}>{STATUS_NAMES[book.status]}</span><p className="detail-author">{book.authors.join(', ') || 'Unknown author'}</p><p className="muted">{book.publisher || 'Publisher unknown'}{book.publishedDate && ` · ${book.publishedDate}`}</p><p className="small-print">{book.formats.length ? book.formats.map(f => f === 'physical' ? 'Physical' : 'Digital').join(' + ') : 'No owned copy'} · {book.editions.length} edition{book.editions.length === 1 ? '' : 's'}{book.isbn && ` · ISBN ${book.isbn}`}</p><Progress book={book} /></div></div>
     <div className="tabs detail-tabs" role="tablist" aria-label="Book sections">{['Details', 'Reading', 'Notes', 'Sources'].map(name => <button key={name} role="tab" aria-selected={tab === name} onClick={() => { setTab(name); setError(''); }}>{name}</button>)}</div>
     <ErrorMessage message={error} />
+    {tab === 'Details' && <BookCoverPhoto book={book} notify={notify} />}
     {tab === 'Details' && <form className="book-form" onSubmit={saveDetails}>
       <div className="form-grid"><label className="full">Title<input required value={title} onChange={e => setTitle(e.target.value)} /></label><label className="full">Author<input value={author} onChange={e => setAuthor(e.target.value)} /></label><label>Page count<input type="number" min="1" max="1000000" value={pages} onChange={e => setPages(e.target.value)} /></label><label>Primary Layer<select value={primary} onChange={e => setPrimary(e.target.value)}><option value="">Unknown / unassigned</option>{LAYERS.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}</select></label></div>
       <fieldset><legend>Your formats</legend><div className="choice-row">{(['physical', 'digital'] as BookFormat[]).map(f => <label key={f} className="choice-chip"><input type="checkbox" checked={formats.includes(f)} onChange={e => setFormats(e.target.checked ? [...formats, f] : formats.filter(v => v !== f))} />{f === 'physical' ? 'Physical' : 'Digital'}</label>)}</div></fieldset>

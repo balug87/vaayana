@@ -14,6 +14,7 @@ test('backup preview is cancellable and repeated self-import does not duplicate 
   await closeDetail(page);
   const first = await exportBackup(page);
   expect(first.document.formatVersion).toBe(1);
+  expect(first.document.schemaVersion).toBe(3);
   expect(first.document.entities.works).toHaveLength(1);
   await page.getByLabel('Import backup or catalog', { exact: true }).setInputFiles(fileUpload('library.json', first.text));
   await expect(page.getByRole('heading', { name: 'Review import before writing' })).toBeVisible();

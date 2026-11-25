@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { X, BookOpen, ArrowUpRight } from 'lucide-react';
 import type { Book, MetadataFields, ReadingStatus } from '../domain/types';
 import { CoverImage } from './CoverImage';
+import { UploadedCoverImage } from './UploadedCoverImage';
 
 export const STATUS_NAMES: Record<ReadingStatus, string> = {
   wishlist: 'Wishlist', 'to-read': 'To read', reading: 'Reading', paused: 'Paused', finished: 'Finished', abandoned: 'Abandoned',
@@ -11,11 +12,13 @@ export const COLORS = ['#315a48', '#935638', '#415b77', '#87523d', '#70683f', '#
 export function bookColor(title: string) {
   return COLORS[Array.from(title).reduce((sum, c) => sum + c.charCodeAt(0), 0) % COLORS.length];
 }
-export function BookCover({ book, covers = false, small = false }: { book: Pick<MetadataFields, 'title' | 'authors' | 'coverId'>; covers?: boolean; small?: boolean }) {
-  const image = covers && book.coverId ? `https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg?default=false` : undefined;
+export function BookCover({ book, covers = false, small = false }: { book: Pick<MetadataFields, 'title' | 'authors' | 'coverId'> & Partial<Pick<Book, 'id' | 'cover'>>; covers?: boolean; small?: boolean }) {
+  const local = book.cover?.kind === 'uploaded' && book.id ? { workId: book.id, revision: book.cover.revision } : undefined;
+  const providerId = book.cover?.kind === 'provider' ? book.cover.coverId : book.coverId;
+  const image = !local && covers && providerId ? `https://covers.openlibrary.org/b/id/${providerId}-M.jpg?default=false` : undefined;
   return <div className={`book-cover ${small ? 'small' : ''}`} style={{ '--book-color': bookColor(book.title) } as React.CSSProperties}>
     <div className="cover-type"><span className="cover-ornament">V</span><strong>{book.title}</strong><span className="cover-rule" /><span>{book.authors.join(' · ') || 'Author unknown'}</span></div>
-    {image && <CoverImage key={image} src={image} />}
+    {local ? <UploadedCoverImage key={local.revision} {...local} /> : image && <CoverImage key={image} src={image} />}
     <span className="book-binding" />
   </div>;
 }

@@ -1,10 +1,10 @@
 {
   "format": "vaayana",
   "formatVersion": 1,
-  "schemaVersion": 2,
-  "exportId": "c0b5bf03-e79d-4172-bc98-7a24dfff8b92",
-  "sourceLibraryId": "cd2f8ea8-b40a-49e4-ac54-cf235f20ace4",
-  "exportedAt": "2026-11-10T14:33:10.554Z",
+  "schemaVersion": 3,
+  "exportId": "2016d5a7-e37f-4124-a492-ce3f9ec9f350",
+  "sourceLibraryId": "32379b99-9d4b-4027-b0f9-7fb68f3e3083",
+  "exportedAt": "2026-11-24T17:50:26.762Z",
   "entities": {
     "works": [
       {
@@ -12,14 +12,14 @@
         "authors": [
           "Example Writer"
         ],
-        "id": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "revision": "29f25dd8-b0ad-481b-a020-0b62dceed7b9",
+        "id": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "revision": "f5860b1f-cf52-4a09-b716-2a1f58bb358d",
         "ancestors": [
-          "7222a056-b25c-4eb9-b06a-d1efccf738dc"
+          "16007b96-582b-40ea-8611-f6ca14374fb7"
         ],
-        "createdAt": "2026-11-10T14:33:10.548Z",
-        "updatedAt": "2026-11-10T14:33:10.548Z",
-        "preferredEditionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee"
+        "createdAt": "2026-11-24T17:50:26.747Z",
+        "updatedAt": "2026-11-24T17:50:26.747Z",
+        "preferredEditionId": "fbe4e11a-8365-4487-bf45-2b48d47d7eea"
       },
       {
         "title": "The Example Observatory",
@@ -28,10 +28,10 @@
         "initialStatus": "to-read",
         "catalogFamilyId": "221ec30a-24de-8a16-bd34-b11cf2de8217",
         "id": "e2708bf9-5520-8911-a5df-1c868d3c3338",
-        "revision": "7e9ceed2-6185-47b3-920e-5d6a485d4bdf",
+        "revision": "7f755b61-f774-4c67-8997-897231780f9e",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.535Z",
-        "updatedAt": "2026-11-10T14:33:10.535Z"
+        "createdAt": "2026-11-24T17:50:26.730Z",
+        "updatedAt": "2026-11-24T17:50:26.730Z"
       }
     ],
     "editions": [
@@ -55,13 +55,13 @@
           }
         ],
         "id": "852408fe-6e74-87d4-a019-c36e3ec09bb9",
-        "revision": "1734c9db-0261-4942-b644-43a5c74bad5d",
+        "revision": "d72395ad-5efd-4942-a6d2-8ffe7fc01e54",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.536Z",
-        "updatedAt": "2026-11-10T14:33:10.536Z"
+        "createdAt": "2026-11-24T17:50:26.731Z",
+        "updatedAt": "2026-11-24T17:50:26.731Z"
       },
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
         "metadata": {
           "title": "A Practice Garden",
           "authors": [
@@ -69,78 +69,78 @@
           ],
           "pageCount": 120
         },
-        "id": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
-        "revision": "8e76453f-c52d-45b4-8855-d9920862e1a7",
+        "id": "fbe4e11a-8365-4487-bf45-2b48d47d7eea",
+        "revision": "5527f907-1b9a-4ac6-8a2a-e57457962624",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.548Z",
-        "updatedAt": "2026-11-10T14:33:10.548Z"
+        "createdAt": "2026-11-24T17:50:26.747Z",
+        "updatedAt": "2026-11-24T17:50:26.747Z"
       }
     ],
     "identifiers": [],
     "holdings": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
-        "format": "digital",
-        "id": "65fb17e9-9efc-489d-88b9-dae6f8776534",
-        "revision": "0b1e728b-715b-43ad-a181-9b46e472517f",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "editionId": "fbe4e11a-8365-4487-bf45-2b48d47d7eea",
+        "format": "physical",
+        "id": "8d52b3b7-6187-4802-8cb8-d8214220015f",
+        "revision": "e1023f02-7cf5-46a6-bc4b-707580f1fe81",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.549Z",
-        "updatedAt": "2026-11-10T14:33:10.549Z"
+        "createdAt": "2026-11-24T17:50:26.748Z",
+        "updatedAt": "2026-11-24T17:50:26.748Z"
       },
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
-        "format": "physical",
-        "id": "7187581d-6af0-4f77-9e91-b679777ced3f",
-        "revision": "95ef1866-a9e6-4b60-bdd1-b5f42651746c",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "editionId": "fbe4e11a-8365-4487-bf45-2b48d47d7eea",
+        "format": "digital",
+        "id": "b8c2bf79-0d89-4af1-9f96-c745ec82acb1",
+        "revision": "a89a2adc-e385-426e-b646-b72fe155d298",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.549Z",
-        "updatedAt": "2026-11-10T14:33:10.549Z"
+        "createdAt": "2026-11-24T17:50:26.748Z",
+        "updatedAt": "2026-11-24T17:50:26.748Z"
       }
     ],
     "metadataSnapshots": [],
     "fieldOverrides": [],
     "readingCycles": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
-        "startedAt": "2026-11-10T14:33:10.550Z",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "editionId": "fbe4e11a-8365-4487-bf45-2b48d47d7eea",
+        "startedAt": "2026-11-24T17:50:26.749Z",
         "status": "reading",
-        "id": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
-        "revision": "caf131ff-991c-45f3-80b4-70ffcd4619fe",
+        "id": "543005ea-d5a0-4e19-b26e-f933bcf6d359",
+        "revision": "a6329a99-7c59-4509-a628-437f99e3611e",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.550Z",
-        "updatedAt": "2026-11-10T14:33:10.550Z"
+        "createdAt": "2026-11-24T17:50:26.749Z",
+        "updatedAt": "2026-11-24T17:50:26.749Z"
       }
     ],
     "statusEvents": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "cycleId": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "cycleId": "543005ea-d5a0-4e19-b26e-f933bcf6d359",
         "status": "reading",
-        "occurredAt": "2026-11-10T14:33:10.550Z",
-        "id": "00038380-e5e1-42a4-b3e2-864b862705eb",
-        "revision": "1d0ab3cd-9055-4fcb-8cac-f9625211699f",
+        "occurredAt": "2026-11-24T17:50:26.749Z",
+        "id": "699627f3-b85a-48c4-a121-5a24e395e437",
+        "revision": "d0e02f0c-d425-462d-a453-aea540eb62a7",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.550Z",
-        "updatedAt": "2026-11-10T14:33:10.550Z"
+        "createdAt": "2026-11-24T17:50:26.749Z",
+        "updatedAt": "2026-11-24T17:50:26.749Z"
       }
     ],
     "sessions": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "editionId": "de191bf1-03ef-49a6-9671-e80d9eebbeee",
-        "cycleId": "1380d531-1de9-45ce-9268-abf2b0cc9af1",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "editionId": "fbe4e11a-8365-4487-bf45-2b48d47d7eea",
+        "cycleId": "543005ea-d5a0-4e19-b26e-f933bcf6d359",
         "occurredAt": "2026-11-10T12:00:00.000Z",
         "pages": 5,
         "minutes": 10,
         "page": 5,
-        "id": "1bf3a43d-fd92-4f65-911a-3a7100e34cf1",
-        "revision": "b64ea42f-1434-47ee-b662-4d0f959d27ca",
+        "id": "e58f5a4c-2f0f-4b3d-8559-07ce8ad37fb6",
+        "revision": "a42b4ec6-5b1f-4e97-8515-b18c7585323b",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.552Z",
-        "updatedAt": "2026-11-10T14:33:10.552Z"
+        "createdAt": "2026-11-24T17:50:26.752Z",
+        "updatedAt": "2026-11-24T17:50:26.752Z"
       }
     ],
     "goals": [
@@ -149,38 +149,38 @@
         "target": 50,
         "startDate": "2026-11-01",
         "endDate": "2026-11-30",
-        "id": "8ad652af-80a2-4ae7-a76f-1eacbf0ed9c8",
-        "revision": "756c1b46-f419-4f67-b361-dd1f2fe35579",
+        "id": "515518fc-ab28-4db8-b2e1-edaffa2ee1a8",
+        "revision": "e8b66f04-1ca3-49c3-aaf8-37de31518427",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.552Z",
-        "updatedAt": "2026-11-10T14:33:10.552Z"
+        "createdAt": "2026-11-24T17:50:26.753Z",
+        "updatedAt": "2026-11-24T17:50:26.753Z"
       }
     ],
     "notes": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
         "text": "Fictional sample reading note.",
-        "id": "0bf1e5ac-15a9-4dd7-b4c2-1db94f9cdb47",
-        "revision": "a10efac3-ca09-4a70-8b34-d0fba5ad7c89",
+        "id": "8670bf4d-5815-4790-9cd9-b16b35b078a9",
+        "revision": "ff3551c2-9966-4e20-b715-002b7951c14e",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.551Z",
-        "updatedAt": "2026-11-10T14:33:10.551Z"
+        "createdAt": "2026-11-24T17:50:26.750Z",
+        "updatedAt": "2026-11-24T17:50:26.750Z"
       }
     ],
     "personalRatings": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
         "value": 4,
-        "id": "6a73e4b7-d1df-4f1f-bd07-c376d089e1de",
-        "revision": "7418ace3-c4e7-492b-8c61-5aae590c9cfd",
+        "id": "8ea68010-550d-45d2-b4c9-fd5337c2597d",
+        "revision": "dd4b8f34-7cc3-4fdf-b9e5-57d4a8cdfd11",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.551Z",
-        "updatedAt": "2026-11-10T14:33:10.551Z"
+        "createdAt": "2026-11-24T17:50:26.750Z",
+        "updatedAt": "2026-11-24T17:50:26.750Z"
       }
     ],
     "layerAssignments": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
         "primary": "fuel",
         "secondary": [],
         "purpose": "Try one practice",
@@ -188,11 +188,11 @@
         "label": "user-selected",
         "evidence": "Selected by you",
         "pinned": true,
-        "id": "7f9a09c0-ee95-4e33-bbcc-db3374926570",
-        "revision": "589afedb-0aab-433b-8e1b-4f7fbdf84e76",
+        "id": "cbec5742-98e6-42de-b2ba-194541018648",
+        "revision": "518ae240-a1ee-44b4-9f7d-fefdaf02edef",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.549Z",
-        "updatedAt": "2026-11-10T14:33:10.549Z"
+        "createdAt": "2026-11-24T17:50:26.748Z",
+        "updatedAt": "2026-11-24T17:50:26.748Z"
       }
     ],
     "tags": [
@@ -203,25 +203,25 @@
         "aliases": [],
         "archived": false,
         "pinned": true,
-        "id": "cd559f60-57d4-4031-8e08-841f1f04182a",
-        "revision": "78930cfd-5469-45d1-98cb-e1139c556b10",
+        "id": "6b4146ad-ee7f-4ca6-a2b2-366440205e5e",
+        "revision": "aa3cd1d4-7775-43fa-ad48-02f4e3431e14",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.547Z",
-        "updatedAt": "2026-11-10T14:33:10.547Z"
+        "createdAt": "2026-11-24T17:50:26.745Z",
+        "updatedAt": "2026-11-24T17:50:26.745Z"
       }
     ],
     "tagAssignments": [
       {
-        "workId": "c991c5a2-6e45-402e-a6e0-96c3c5787456",
-        "tagId": "cd559f60-57d4-4031-8e08-841f1f04182a",
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "tagId": "6b4146ad-ee7f-4ca6-a2b2-366440205e5e",
         "origin": "user",
         "state": "accepted",
         "pinned": true,
-        "id": "4f9be563-e39a-490e-a1f9-1295baea27c0",
-        "revision": "681c9ada-f9e7-4c19-8637-2901812b4a46",
+        "id": "972384d2-6206-47d4-9d72-536e97694027",
+        "revision": "df14d68f-94fe-448e-928c-555223f1c49f",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.550Z",
-        "updatedAt": "2026-11-10T14:33:10.550Z"
+        "createdAt": "2026-11-24T17:50:26.750Z",
+        "updatedAt": "2026-11-24T17:50:26.750Z"
       }
     ],
     "tagRedirects": [],
@@ -234,19 +234,20 @@
         "value": {
           "onlineAccess": false,
           "loadCovers": false,
+          "autoFetchCovers": false,
           "useLibraryInterests": false,
           "interests": [],
           "modelConsent": false,
           "reducedMotion": false,
           "view": "shelf",
           "onboardingComplete": false,
-          "lastExportAt": "2026-11-10T14:33:10.554Z"
+          "lastExportAt": "2026-11-24T17:50:26.762Z"
         },
         "id": "preferences",
-        "revision": "f187fff1-3dcc-49d1-a498-c247d7bd9d1b",
+        "revision": "cb04c1de-55fd-4b38-8729-18509386c7c0",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.554Z",
-        "updatedAt": "2026-11-10T14:33:10.554Z"
+        "createdAt": "2026-11-24T17:50:26.762Z",
+        "updatedAt": "2026-11-24T17:50:26.762Z"
       }
     ],
     "tombstones": [],
@@ -262,11 +263,28 @@
           "notes": "A fictional catalog used only for documentation.",
           "unverified": true
         },
-        "id": "b165558f-354a-4c17-912d-618184a0720a",
-        "revision": "eb5f4b53-5a4e-41de-9e29-2a1857eaa805",
+        "id": "fd038e7a-c407-41b4-8dff-0a8cb264aca7",
+        "revision": "0a81c8b1-5c9a-40ba-a56b-9b8656e7e9de",
         "ancestors": [],
-        "createdAt": "2026-11-10T14:33:10.544Z",
-        "updatedAt": "2026-11-10T14:33:10.544Z"
+        "createdAt": "2026-11-24T17:50:26.740Z",
+        "updatedAt": "2026-11-24T17:50:26.740Z"
+      }
+    ],
+    "coverStates": [
+      {
+        "workId": "4a662d0d-bc37-4ff6-842c-9e28147d7ccc",
+        "uploaded": {
+          "mime": "image/jpeg",
+          "width": 32,
+          "height": 48,
+          "byteLength": 277,
+          "jpegBase64": "/9j/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAwACADASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAT/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFgEBAQEAAAAAAAAAAAAAAAAAAAME/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AnAYEwAAAAAAAAAH/2Q=="
+        },
+        "id": "9148e903-ef70-4973-bd54-8826ed654fed",
+        "revision": "d4968715-b297-4a9d-bc02-7350e8b77d76",
+        "ancestors": [],
+        "createdAt": "2026-11-24T17:50:26.756Z",
+        "updatedAt": "2026-11-24T17:50:26.756Z"
       }
     ]
   }
